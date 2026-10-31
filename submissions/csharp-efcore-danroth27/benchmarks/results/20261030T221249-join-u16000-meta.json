@@ -1,0 +1,36 @@
+{
+  "variant": "join",
+  "users": 16000,
+  "workload": "optimization-pool-a",
+  "candidate": {
+    "name": "join",
+    "sdk": "10.0.403",
+    "sha256": "BF7F82BD0AC149CE8ECB8D76AA734F9CEA7178911B6454302CAB97E02213E106",
+    "environment": {},
+    "properties": {},
+    "description": "Source-generated JSON candidate with standard joined tag collection instead of scalar array aggregation",
+    "created_utc": "2026-10-30T22:02:57.9643313+00:00",
+    "source_patch": "variants/join.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 131.212778,
+      "cpu_percent": 36.85524433883298,
+      "elapsed_ms": 59337
+    },
+    "app": {
+      "core_seconds": 125.528867,
+      "cpu_percent": 35.25992724923457,
+      "elapsed_ms": 59335
+    },
+    "loadgen": {
+      "core_seconds": 28.547758,
+      "cpu_percent": 24.052775343758427,
+      "elapsed_ms": 59344
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

@@ -1,0 +1,36 @@
+{
+  "variant": "prepared",
+  "users": 4000,
+  "workload": "optimization-control-a",
+  "candidate": {
+    "name": "prepared",
+    "sdk": "10.0.403",
+    "sha256": "97DC3D5CE4DA32D13D2BBB514979805EAEAC5669BDD38FC23D5AB45C26C15758",
+    "environment": {},
+    "properties": {},
+    "description": "Preparation only, max64/min2; original LINQ and pool90",
+    "created_utc": "2026-10-30T21:24:23.6753420+00:00",
+    "source_patch": "variants/prepared.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "elapsed_ms": 58919,
+      "cpu_percent": 36.823941343199984,
+      "core_seconds": 130.177788
+    },
+    "app": {
+      "elapsed_ms": 58903,
+      "cpu_percent": 19.134666315807344,
+      "core_seconds": 67.625355
+    },
+    "loadgen": {
+      "elapsed_ms": 58917,
+      "cpu_percent": 10.29918444591544,
+      "core_seconds": 12.135941
+    }
+  },
+  "warmup_seconds": 40,
+  "ramp_seconds": 20,
+  "measure_seconds": 60
+}

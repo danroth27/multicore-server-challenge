@@ -1,0 +1,39 @@
+{
+  "variant": "session16",
+  "users": 16000,
+  "workload": "optimization-pool-a",
+  "candidate": {
+    "name": "session16",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {
+      "DB_POOL_SIZE": "16",
+      "DB_OPTIONS": "-c jit=off -c max_parallel_workers_per_gather=0 -c plan_cache_mode=force_generic_plan"
+    },
+    "properties": {},
+    "description": "Pool16 with session-only generic plans, JIT and parallelism disabled",
+    "created_utc": "2026-10-30T22:03:36.4841848+00:00",
+    "source_patch": "variants/session16.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 164.232348,
+      "cpu_percent": 46.09487386750194,
+      "elapsed_ms": 59382
+    },
+    "app": {
+      "core_seconds": 118.567845,
+      "cpu_percent": 33.300710289508274,
+      "elapsed_ms": 59342
+    },
+    "loadgen": {
+      "core_seconds": 28.005241,
+      "cpu_percent": 23.598861568019416,
+      "elapsed_ms": 59336
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

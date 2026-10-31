@@ -1,0 +1,36 @@
+{
+  "variant": "linq",
+  "users": 12000,
+  "workload": "optimization-platform-a",
+  "candidate": {
+    "name": "linq",
+    "sdk": "10.0.403",
+    "sha256": "380CFB39F8DC8709805F486CABD757884751A0D9A85FF1D2A32ECD853BABD61B",
+    "environment": {},
+    "properties": {},
+    "description": "LINQ-only bounded LATERAL feed, page IDs before enrichment, direct junction-table counts",
+    "created_utc": "2026-10-30T21:30:43.3000865+00:00",
+    "source_patch": "variants/linq.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "elapsed_ms": 89097,
+      "cpu_percent": 29.36858423964892,
+      "core_seconds": 156.999165
+    },
+    "app": {
+      "elapsed_ms": 89012,
+      "cpu_percent": 41.05968109168801,
+      "core_seconds": 219.28826
+    },
+    "loadgen": {
+      "elapsed_ms": 89011,
+      "cpu_percent": 20.286338205390347,
+      "core_seconds": 36.114145
+    }
+  },
+  "warmup_seconds": 40,
+  "ramp_seconds": 20,
+  "measure_seconds": 90
+}

@@ -1,0 +1,36 @@
+{
+  "variant": "json",
+  "users": 16000,
+  "workload": "optimization-pool-a",
+  "candidate": {
+    "name": "json",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {},
+    "properties": {},
+    "description": "UTF-8 timestamps plus standard System.Text.Json source-generated metadata",
+    "created_utc": "2026-10-30T21:46:30.8611729+00:00",
+    "source_patch": "variants/json.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 132.181155,
+      "cpu_percent": 37.291273105829774,
+      "elapsed_ms": 59076
+    },
+    "app": {
+      "core_seconds": 121.866176,
+      "cpu_percent": 34.39457662325933,
+      "elapsed_ms": 59053
+    },
+    "loadgen": {
+      "core_seconds": 28.848652,
+      "cpu_percent": 24.399624473501703,
+      "elapsed_ms": 59117
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

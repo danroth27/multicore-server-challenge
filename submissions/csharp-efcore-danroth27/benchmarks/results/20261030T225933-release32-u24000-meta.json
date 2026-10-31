@@ -1,0 +1,36 @@
+{
+  "variant": "release32",
+  "users": 24000,
+  "workload": "optimization-final-screen-a",
+  "candidate": {
+    "name": "release32",
+    "sdk": "10.0.403",
+    "sha256": "8BEE314382D611DF167BE4278A668AFDC289279E7CADE4DB7F65418198B51FEB",
+    "environment": {},
+    "properties": {},
+    "description": "Ordinary EF connection lifetime, default pool32, compiled LINQ and three targeted upserts",
+    "created_utc": "2026-10-30T22:54:21.8108737+00:00",
+    "source_patch": "variants/release32.patch",
+    "database_role": "conduit"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 272.577112,
+      "cpu_percent": 50.952802452519805,
+      "elapsed_ms": 89160
+    },
+    "app": {
+      "core_seconds": 212.895812,
+      "cpu_percent": 39.78989103822073,
+      "elapsed_ms": 89175
+    },
+    "loadgen": {
+      "core_seconds": 50.51616,
+      "cpu_percent": 28.341015686362514,
+      "elapsed_ms": 89122
+    }
+  },
+  "warmup_seconds": 120,
+  "ramp_seconds": 45,
+  "measure_seconds": 90
+}

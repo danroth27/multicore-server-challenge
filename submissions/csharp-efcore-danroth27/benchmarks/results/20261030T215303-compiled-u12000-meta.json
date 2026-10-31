@@ -1,0 +1,36 @@
+{
+  "variant": "compiled",
+  "users": 12000,
+  "workload": "optimization-platform-a",
+  "candidate": {
+    "name": "compiled",
+    "sdk": "10.0.403",
+    "sha256": "E110B4ACF0500AFB962D92C8A8748F1BBE5B73A8B572EB255FA6311C6F821A1D",
+    "environment": {},
+    "properties": {},
+    "description": "EF compiled LINQ queries with shared static projection and bounded feed",
+    "created_utc": "2026-10-30T21:42:44.6885364+00:00",
+    "source_patch": "variants/compiled.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "elapsed_ms": 87225,
+      "cpu_percent": 31.611263399254806,
+      "core_seconds": 165.437547
+    },
+    "app": {
+      "elapsed_ms": 87132,
+      "cpu_percent": 33.40861088157431,
+      "core_seconds": 174.657545
+    },
+    "loadgen": {
+      "elapsed_ms": 87006,
+      "cpu_percent": 21.28064558766062,
+      "core_seconds": 37.030877
+    }
+  },
+  "warmup_seconds": 40,
+  "ramp_seconds": 20,
+  "measure_seconds": 90
+}

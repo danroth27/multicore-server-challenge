@@ -1,0 +1,36 @@
+{
+  "variant": "utf8",
+  "users": 12000,
+  "workload": "optimization-platform-a",
+  "candidate": {
+    "name": "utf8",
+    "sdk": "10.0.403",
+    "sha256": "ED0BEEE097B5D7BE71346D528E60AF4E3F6DAEA390FE0B2349C8724C77A71B8C",
+    "environment": {},
+    "properties": {},
+    "description": "Compiled queries plus allocation-free standard DateTime UTF-8 formatting",
+    "created_utc": "2026-10-30T21:46:20.8527286+00:00",
+    "source_patch": "variants/utf8.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "elapsed_ms": 89233,
+      "cpu_percent": 30.410604821086366,
+      "core_seconds": 162.81777
+    },
+    "app": {
+      "elapsed_ms": 89241,
+      "cpu_percent": 31.468648752628646,
+      "core_seconds": 168.497621
+    },
+    "loadgen": {
+      "elapsed_ms": 89231,
+      "cpu_percent": 19.812553933050175,
+      "core_seconds": 35.35788
+    }
+  },
+  "warmup_seconds": 40,
+  "ramp_seconds": 20,
+  "measure_seconds": 90
+}

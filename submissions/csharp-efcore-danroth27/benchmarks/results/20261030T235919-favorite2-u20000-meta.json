@@ -1,0 +1,36 @@
+{
+  "variant": "favorite2",
+  "users": 20000,
+  "workload": "optimization-hold-b",
+  "candidate": {
+    "name": "favorite2",
+    "sdk": "10.0.403",
+    "sha256": "27F2807D720EA327A10110E9B49018C5910467F11F58FB37F9F4842B1CC87901",
+    "environment": {},
+    "properties": {},
+    "description": "Held pool32 finalist with favorite mutation reduced to two commands",
+    "created_utc": "2026-10-30T23:48:53.5005505+00:00",
+    "source_patch": "variants/favorite2.patch",
+    "database_role": "conduit"
+  },
+  "cpu": {
+    "postgres": {
+      "elapsed_ms": 299360,
+      "core_seconds": 820.077271,
+      "cpu_percent": 45.657250523338675
+    },
+    "app": {
+      "elapsed_ms": 299338,
+      "core_seconds": 647.489966,
+      "cpu_percent": 36.05121779838621
+    },
+    "loadgen": {
+      "elapsed_ms": 299292,
+      "core_seconds": 148.147781,
+      "cpu_percent": 24.74970613982332
+    }
+  },
+  "warmup_seconds": 180,
+  "ramp_seconds": 60,
+  "measure_seconds": 300
+}

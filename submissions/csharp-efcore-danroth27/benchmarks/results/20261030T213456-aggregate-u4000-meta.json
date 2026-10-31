@@ -1,0 +1,36 @@
+{
+  "variant": "aggregate",
+  "users": 4000,
+  "workload": "optimization-query-a",
+  "candidate": {
+    "name": "aggregate",
+    "sdk": "10.0.403",
+    "sha256": "118408DDF8A4421F652E257A5DB2FEBB0DCF13CE820879BA5B8A4732D1504694",
+    "environment": {},
+    "properties": {},
+    "description": "LINQ plus provider ArrayAgg tag projection: one SQL row and one favorites count per article",
+    "created_utc": "2026-10-30T21:31:14.9599820+00:00",
+    "source_patch": "variants/aggregate.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 41.442395,
+      "elapsed_ms": 58969,
+      "cpu_percent": 11.713045555009128
+    },
+    "app": {
+      "core_seconds": 79.305532,
+      "elapsed_ms": 59007,
+      "cpu_percent": 22.40003502409319
+    },
+    "loadgen": {
+      "core_seconds": 12.877791,
+      "elapsed_ms": 59049,
+      "cpu_percent": 10.904326068180664
+    }
+  },
+  "warmup_seconds": 40,
+  "ramp_seconds": 20,
+  "measure_seconds": 60
+}

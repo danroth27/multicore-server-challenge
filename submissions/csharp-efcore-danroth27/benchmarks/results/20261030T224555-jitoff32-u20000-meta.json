@@ -1,0 +1,39 @@
+{
+  "variant": "jitoff32",
+  "users": 20000,
+  "workload": "optimization-tuning-a",
+  "candidate": {
+    "name": "jitoff32",
+    "sdk": "10.0.403",
+    "sha256": "F3B661A3F0ACBC051135999301E00EF5B620E1603AB984C2F9DEB3FC3D91BDF3",
+    "environment": {
+      "DB_POOL_SIZE": "32",
+      "DB_OPTIONS": "-c jit=off"
+    },
+    "properties": {},
+    "description": "Upsert32 with PostgreSQL session JIT disabled, automatic plan choice retained",
+    "created_utc": "2026-10-30T22:30:15.8173776+00:00",
+    "source_patch": "variants/jitoff32.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "cpu_percent": 42.63783687703142,
+      "core_seconds": 151.122138,
+      "elapsed_ms": 59072
+    },
+    "app": {
+      "cpu_percent": 36.41843752469324,
+      "core_seconds": 129.048005,
+      "elapsed_ms": 59058
+    },
+    "loadgen": {
+      "cpu_percent": 27.897925065212238,
+      "core_seconds": 32.940754,
+      "elapsed_ms": 59038
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

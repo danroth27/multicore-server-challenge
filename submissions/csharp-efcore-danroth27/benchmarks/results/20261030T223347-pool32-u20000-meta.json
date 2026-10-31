@@ -1,0 +1,38 @@
+{
+  "variant": "pool32",
+  "users": 20000,
+  "workload": "optimization-tuning-a",
+  "candidate": {
+    "name": "pool32",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {
+      "DB_POOL_SIZE": "32"
+    },
+    "properties": {},
+    "description": "JSON candidate with Npgsql maximum pool 32",
+    "created_utc": "2026-10-30T22:03:36.4207729+00:00",
+    "source_patch": "variants/pool32.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "cpu_percent": 44.23710715169512,
+      "core_seconds": 157.310692,
+      "elapsed_ms": 59268
+    },
+    "app": {
+      "cpu_percent": 36.75775076672013,
+      "core_seconds": 130.640722,
+      "elapsed_ms": 59235
+    },
+    "loadgen": {
+      "cpu_percent": 28.095101896094686,
+      "core_seconds": 33.279772,
+      "elapsed_ms": 59227
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

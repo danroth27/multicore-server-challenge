@@ -1,0 +1,38 @@
+{
+  "variant": "upsert32",
+  "users": 20000,
+  "workload": "optimization-tuning-a",
+  "candidate": {
+    "name": "upsert32",
+    "sdk": "10.0.403",
+    "sha256": "F3B661A3F0ACBC051135999301E00EF5B620E1603AB984C2F9DEB3FC3D91BDF3",
+    "environment": {
+      "DB_POOL_SIZE": "32"
+    },
+    "properties": {},
+    "description": "Scoped page/count connection plus three targeted parameterized EF Core idempotent upserts",
+    "created_utc": "2026-10-30T22:30:13.0101032+00:00",
+    "source_patch": "variants/upsert32.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "cpu_percent": 42.600376883008764,
+      "core_seconds": 151.464788,
+      "elapsed_ms": 59258
+    },
+    "app": {
+      "cpu_percent": 35.569744096594526,
+      "core_seconds": 126.320255,
+      "elapsed_ms": 59189
+    },
+    "loadgen": {
+      "cpu_percent": 27.736305619421152,
+      "core_seconds": 32.813159,
+      "elapsed_ms": 59152
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

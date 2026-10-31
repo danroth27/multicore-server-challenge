@@ -1,0 +1,36 @@
+{
+  "variant": "oldest",
+  "users": 4000,
+  "workload": "optimization-query-a",
+  "candidate": {
+    "name": "oldest",
+    "sdk": "10.0.403",
+    "sha256": "2FFF5FAAB386937CED6A7D7EDCA48DD178497EFF4CA689BE3175BB6A4CB3984D",
+    "environment": {},
+    "properties": {},
+    "description": "Comments candidate plus oldest-end ordered global capped count for index-only access",
+    "created_utc": "2026-10-30T21:32:12.2102915+00:00",
+    "source_patch": "variants/oldest.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 46.177202,
+      "elapsed_ms": 58872,
+      "cpu_percent": 13.072768605335872
+    },
+    "app": {
+      "core_seconds": 77.822601,
+      "elapsed_ms": 58881,
+      "cpu_percent": 22.028215383570256
+    },
+    "loadgen": {
+      "core_seconds": 13.180075,
+      "elapsed_ms": 59058,
+      "cpu_percent": 11.158585627688037
+    }
+  },
+  "warmup_seconds": 40,
+  "ramp_seconds": 20,
+  "measure_seconds": 60
+}

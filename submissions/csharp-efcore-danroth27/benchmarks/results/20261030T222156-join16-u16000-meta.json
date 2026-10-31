@@ -1,0 +1,38 @@
+{
+  "variant": "join16",
+  "users": 16000,
+  "workload": "optimization-pool-a",
+  "candidate": {
+    "name": "join16",
+    "sdk": "10.0.403",
+    "sha256": "BF7F82BD0AC149CE8ECB8D76AA734F9CEA7178911B6454302CAB97E02213E106",
+    "environment": {
+      "DB_POOL_SIZE": "16"
+    },
+    "properties": {},
+    "description": "Joined tag projection with pool16",
+    "created_utc": "2026-10-30T22:03:36.4630450+00:00",
+    "source_patch": "variants/join16.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 126.71009,
+      "cpu_percent": 35.55217645045257,
+      "elapsed_ms": 59401
+    },
+    "app": {
+      "core_seconds": 124.409019,
+      "cpu_percent": 34.93124294546741,
+      "elapsed_ms": 59359
+    },
+    "loadgen": {
+      "core_seconds": 28.6735,
+      "cpu_percent": 24.16727070444853,
+      "elapsed_ms": 59323
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

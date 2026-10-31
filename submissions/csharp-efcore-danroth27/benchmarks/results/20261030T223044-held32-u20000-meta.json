@@ -1,0 +1,38 @@
+{
+  "variant": "held32",
+  "users": 20000,
+  "workload": "optimization-tuning-a",
+  "candidate": {
+    "name": "held32",
+    "sdk": "10.0.403",
+    "sha256": "7A27832A5CF46599E1860955ABAC67BBBC2DC5FB29E912145F545F92D56A9CB9",
+    "environment": {
+      "DB_POOL_SIZE": "32"
+    },
+    "properties": {},
+    "description": "JSON candidate, pool32, keep one standard EF connection open across page and count",
+    "created_utc": "2026-10-30T22:28:29.9306905+00:00",
+    "source_patch": "variants/held32.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "cpu_percent": 43.003661083629844,
+      "core_seconds": 148.659356,
+      "elapsed_ms": 57615
+    },
+    "app": {
+      "cpu_percent": 37.51299543918136,
+      "core_seconds": 129.626906,
+      "elapsed_ms": 57592
+    },
+    "loadgen": {
+      "cpu_percent": 28.016464063344788,
+      "core_seconds": 32.1276,
+      "elapsed_ms": 57337
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

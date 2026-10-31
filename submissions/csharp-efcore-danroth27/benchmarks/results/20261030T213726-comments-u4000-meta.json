@@ -1,0 +1,36 @@
+{
+  "variant": "comments",
+  "users": 4000,
+  "workload": "optimization-query-a",
+  "candidate": {
+    "name": "comments",
+    "sdk": "10.0.403",
+    "sha256": "ACC104CF16EC9B90FFC6D132498B6167D82C52E7447B66399E20ECF9A5128D82",
+    "environment": {},
+    "properties": {},
+    "description": "Aggregate candidate plus one LINQ query for article existence and comments",
+    "created_utc": "2026-10-30T21:31:36.9392043+00:00",
+    "source_patch": "variants/comments.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 42.638279,
+      "elapsed_ms": 59505,
+      "cpu_percent": 11.942491947455395
+    },
+    "app": {
+      "core_seconds": 77.884365,
+      "elapsed_ms": 59499,
+      "cpu_percent": 21.81671540698163
+    },
+    "loadgen": {
+      "core_seconds": 12.803123,
+      "elapsed_ms": 59507,
+      "cpu_percent": 10.757661283546472
+    }
+  },
+  "warmup_seconds": 40,
+  "ramp_seconds": 20,
+  "measure_seconds": 60
+}

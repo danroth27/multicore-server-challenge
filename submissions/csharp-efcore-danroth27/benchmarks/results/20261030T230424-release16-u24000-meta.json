@@ -1,0 +1,38 @@
+{
+  "variant": "release16",
+  "users": 24000,
+  "workload": "optimization-final-screen-a",
+  "candidate": {
+    "name": "release16",
+    "sdk": "10.0.403",
+    "sha256": "8BEE314382D611DF167BE4278A668AFDC289279E7CADE4DB7F65418198B51FEB",
+    "environment": {
+      "DB_POOL_SIZE": "16"
+    },
+    "properties": {},
+    "description": "Release candidate with pool16",
+    "created_utc": "2026-10-30T22:54:21.8524432+00:00",
+    "source_patch": "variants/release16.patch",
+    "database_role": "conduit"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 241.816804,
+      "cpu_percent": 45.24998110037014,
+      "elapsed_ms": 89067
+    },
+    "app": {
+      "core_seconds": 215.099822,
+      "cpu_percent": 40.27136331127861,
+      "elapsed_ms": 89021
+    },
+    "loadgen": {
+      "core_seconds": 49.790696,
+      "cpu_percent": 27.984878597122304,
+      "elapsed_ms": 88960
+    }
+  },
+  "warmup_seconds": 120,
+  "ramp_seconds": 45,
+  "measure_seconds": 90
+}

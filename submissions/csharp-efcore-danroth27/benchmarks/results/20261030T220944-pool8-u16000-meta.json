@@ -1,0 +1,38 @@
+{
+  "variant": "pool8",
+  "users": 16000,
+  "workload": "optimization-pool-a",
+  "candidate": {
+    "name": "pool8",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {
+      "DB_POOL_SIZE": "8"
+    },
+    "properties": {},
+    "description": "JSON candidate with Npgsql maximum pool 8",
+    "created_utc": "2026-10-30T22:03:36.3758680+00:00",
+    "source_patch": "variants/pool8.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 118.543338,
+      "cpu_percent": 33.29719394633949,
+      "elapsed_ms": 59336
+    },
+    "app": {
+      "core_seconds": 122.19534,
+      "cpu_percent": 34.31894241949345,
+      "elapsed_ms": 59343
+    },
+    "loadgen": {
+      "core_seconds": 28.861815,
+      "cpu_percent": 24.3218908533194,
+      "elapsed_ms": 59333
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

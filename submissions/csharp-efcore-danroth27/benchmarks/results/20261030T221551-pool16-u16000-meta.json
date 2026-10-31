@@ -1,0 +1,38 @@
+{
+  "variant": "pool16",
+  "users": 16000,
+  "workload": "optimization-pool-a",
+  "candidate": {
+    "name": "pool16",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {
+      "DB_POOL_SIZE": "16"
+    },
+    "properties": {},
+    "description": "JSON candidate with Npgsql maximum pool 16",
+    "created_utc": "2026-10-30T22:03:36.3995614+00:00",
+    "source_patch": "variants/pool16.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "core_seconds": 128.062516,
+      "cpu_percent": 36.01834801489531,
+      "elapsed_ms": 59258
+    },
+    "app": {
+      "core_seconds": 119.685063,
+      "cpu_percent": 33.65078190897129,
+      "elapsed_ms": 59278
+    },
+    "loadgen": {
+      "core_seconds": 28.917579,
+      "cpu_percent": 24.399725775422727,
+      "elapsed_ms": 59258
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

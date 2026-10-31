@@ -1,0 +1,39 @@
+{
+  "variant": "gc2",
+  "users": 20000,
+  "workload": "optimization-tuning-a",
+  "candidate": {
+    "name": "gc2",
+    "sdk": "10.0.403",
+    "sha256": "F3B661A3F0ACBC051135999301E00EF5B620E1603AB984C2F9DEB3FC3D91BDF3",
+    "environment": {
+      "DB_POOL_SIZE": "32",
+      "DOTNET_GCHeapCount": "2"
+    },
+    "properties": {},
+    "description": "Upsert32 with server GC maximum heap count 2",
+    "created_utc": "2026-10-30T22:30:15.7970733+00:00",
+    "source_patch": "variants/gc2.patch",
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "cpu_percent": 42.77827059493022,
+      "core_seconds": 151.848316,
+      "elapsed_ms": 59161
+    },
+    "app": {
+      "cpu_percent": 35.551947795915154,
+      "core_seconds": 126.23359,
+      "elapsed_ms": 59178
+    },
+    "loadgen": {
+      "cpu_percent": 28.177650650295128,
+      "core_seconds": 33.321199,
+      "elapsed_ms": 59127
+    }
+  },
+  "warmup_seconds": 60,
+  "ramp_seconds": 30,
+  "measure_seconds": 60
+}

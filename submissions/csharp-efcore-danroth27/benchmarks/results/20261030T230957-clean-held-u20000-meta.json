@@ -1,0 +1,36 @@
+{
+  "variant": "clean-held",
+  "users": 20000,
+  "workload": "optimization-hold-a",
+  "candidate": {
+    "name": "clean-held",
+    "sdk": "10.0.403",
+    "sha256": "82C7D4DC686CD9E82FECB26752D356A09019F67BF161386AA0CEBD291EB904C6",
+    "environment": {},
+    "properties": {},
+    "description": "Cleaned upsert candidate, default pool32, ordinary conduit role, scoped page/count connection",
+    "created_utc": "2026-10-30T22:52:10.5720740+00:00",
+    "source_patch": "variants/clean-held.patch",
+    "database_role": "conduit"
+  },
+  "cpu": {
+    "postgres": {
+      "cpu_percent": 45.925306277346195,
+      "core_seconds": 822.908008,
+      "elapsed_ms": 298640
+    },
+    "app": {
+      "cpu_percent": 36.9446053520482,
+      "core_seconds": 661.711132,
+      "elapsed_ms": 298515
+    },
+    "loadgen": {
+      "cpu_percent": 24.48271449158791,
+      "core_seconds": 146.103047,
+      "elapsed_ms": 298380
+    }
+  },
+  "warmup_seconds": 180,
+  "ramp_seconds": 60,
+  "measure_seconds": 300
+}

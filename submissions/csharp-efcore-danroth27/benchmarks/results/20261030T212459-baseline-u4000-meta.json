@@ -1,0 +1,36 @@
+{
+  "variant": "baseline",
+  "users": 4000,
+  "workload": "optimization-control-a",
+  "candidate": {
+    "name": "baseline",
+    "sdk": "10.0.403",
+    "sha256": "4CE81E1763552313626294C447401F695FF1053D48BC77E5EDE3DA127C26A68E",
+    "environment": {},
+    "properties": {},
+    "description": "Unmodified PR20, rebuilt with the same SDK as all candidates",
+    "created_utc": "2026-10-30T21:17:50.1048435+00:00",
+    "source_patch": null,
+    "database_role": "postgres"
+  },
+  "cpu": {
+    "postgres": {
+      "elapsed_ms": 56976,
+      "cpu_percent": 43.51098269446784,
+      "core_seconds": 148.744905
+    },
+    "app": {
+      "elapsed_ms": 56837,
+      "cpu_percent": 19.174913641935124,
+      "core_seconds": 65.390674
+    },
+    "loadgen": {
+      "elapsed_ms": 56685,
+      "cpu_percent": 10.561307224133369,
+      "core_seconds": 11.973354
+    }
+  },
+  "warmup_seconds": 40,
+  "ramp_seconds": 20,
+  "measure_seconds": 60
+}
