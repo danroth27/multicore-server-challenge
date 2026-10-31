@@ -1,0 +1,2 @@
+FROM golang:1.27.1-bookworm
+RUN apt-get update -qq && apt-get install -y --no-install-recommends postgresql-client ca-certificates > /dev/null

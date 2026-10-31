@@ -1,0 +1,742 @@
+{
+  "warning": "Instrumented diagnostic run, not a ranking trial. Rate/delta instruments are not absolute gauges. Thread-time traces are not on-CPU profiles.",
+  "metrics": [
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.active_requests ({request})",
+      "tags": "http.request.method=DELETE,url.scheme=http",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.45714285714285713,
+      "minimum": 0,
+      "maximum": 10
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.active_requests ({request})",
+      "tags": "http.request.method=GET,url.scheme=http",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 37.8,
+      "minimum": 0,
+      "maximum": 713
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.active_requests ({request})",
+      "tags": "http.request.method=POST,url.scheme=http",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 4.6571428571428575,
+      "minimum": 0,
+      "maximum": 76
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.active_requests ({request})",
+      "tags": "http.request.method=PUT,url.scheme=http",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.2,
+      "minimum": 0,
+      "maximum": 4
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/articles/{slug},network.protocol.version=1.1,url.scheme=http,Percentile=50",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.009269142150878906,
+      "minimum": 0.0007266998291015625,
+      "maximum": 0.154052734375
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/articles/{slug},network.protocol.version=1.1,url.scheme=http,Percentile=95",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.025674383980887276,
+      "minimum": 0.0019054412841796875,
+      "maximum": 0.21875
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/articles/{slug},network.protocol.version=1.1,url.scheme=http,Percentile=99",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.03389739990234375,
+      "minimum": 0.00293731689453125,
+      "maximum": 0.23095703125
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/profiles/{username},network.protocol.version=1.1,url.scheme=http,Percentile=50",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.0094879150390625,
+      "minimum": 0.000560760498046875,
+      "maximum": 0.168701171875
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/profiles/{username},network.protocol.version=1.1,url.scheme=http,Percentile=95",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.025034114292689733,
+      "minimum": 0.002529144287109375,
+      "maximum": 0.216552734375
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/profiles/{username},network.protocol.version=1.1,url.scheme=http,Percentile=99",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.03402557373046875,
+      "minimum": 0.00408172607421875,
+      "maximum": 0.227294921875
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/tags,network.protocol.version=1.1,url.scheme=http,Percentile=50",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.009278760637555804,
+      "minimum": 0.0006008148193359375,
+      "maximum": 0.16259765625
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/tags,network.protocol.version=1.1,url.scheme=http,Percentile=95",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.02505084446498326,
+      "minimum": 0.0019168853759765625,
+      "maximum": 0.215087890625
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/tags,network.protocol.version=1.1,url.scheme=http,Percentile=99",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.03343854631696429,
+      "minimum": 0.0029754638671875,
+      "maximum": 0.2314453125
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/user,network.protocol.version=1.1,url.scheme=http,Percentile=50",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.010883849007742745,
+      "minimum": 0.000530242919921875,
+      "maximum": 0.17822265625
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/user,network.protocol.version=1.1,url.scheme=http,Percentile=95",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.027397918701171874,
+      "minimum": 0.001678466796875,
+      "maximum": 0.229736328125
+    },
+    {
+      "provider": "Microsoft.AspNetCore.Hosting",
+      "name": "http.server.request.duration (s)",
+      "tags": "http.request.method=GET,http.response.status_code=200,http.route=/api/user,network.protocol.version=1.1,url.scheme=http,Percentile=99",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.02845644269670759,
+      "minimum": 0.001678466796875,
+      "maximum": 0.229736328125
+    },
+    {
+      "provider": "Microsoft.EntityFrameworkCore",
+      "name": "microsoft.entityframeworkcore.active_dbcontexts ({dbcontext})",
+      "tags": "",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 495.57142857142856,
+      "minimum": 212,
+      "maximum": 884
+    },
+    {
+      "provider": "Microsoft.EntityFrameworkCore",
+      "name": "microsoft.entityframeworkcore.compiled_query_cache_hits ({hits} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 231.94117647058823,
+      "minimum": 196,
+      "maximum": 272
+    },
+    {
+      "provider": "Microsoft.EntityFrameworkCore",
+      "name": "microsoft.entityframeworkcore.compiled_query_cache_misses ({misses} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 0.058823529411764705,
+      "minimum": 0,
+      "maximum": 2
+    },
+    {
+      "provider": "Microsoft.EntityFrameworkCore",
+      "name": "microsoft.entityframeworkcore.execution_strategy_operation_failures ({failure} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 0,
+      "minimum": 0,
+      "maximum": 0
+    },
+    {
+      "provider": "Microsoft.EntityFrameworkCore",
+      "name": "microsoft.entityframeworkcore.optimistic_concurrency_failures ({failure} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 0,
+      "minimum": 0,
+      "maximum": 0
+    },
+    {
+      "provider": "Microsoft.EntityFrameworkCore",
+      "name": "microsoft.entityframeworkcore.queries ({query} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 4204.058823529412,
+      "minimum": 3390,
+      "maximum": 4865
+    },
+    {
+      "provider": "Microsoft.EntityFrameworkCore",
+      "name": "microsoft.entityframeworkcore.savechanges ({savechanges} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 149.02941176470588,
+      "minimum": 110,
+      "maximum": 183
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.connection.count ({connection})",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2,db.client.connection.state=idle",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 77.51428571428572,
+      "minimum": 8,
+      "maximum": 89
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.connection.count ({connection})",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2,db.client.connection.state=used",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 12.485714285714286,
+      "minimum": 1,
+      "maximum": 82
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.connection.max ({connection})",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 90,
+      "minimum": 90,
+      "maximum": 90
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.connection.npgsql.pending_requests ({request})",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2",
+      "counter_type": "Metric",
+      "samples": 31,
+      "mean": 34.38709677419355,
+      "minimum": 0,
+      "maximum": 717
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.operation.duration (s)",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2,db.system.name=postgresql,server.address=127.0.0.1,server.port=5432,Percentile=50",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.001949037824358259,
+      "minimum": 0.0006008148193359375,
+      "maximum": 0.0150604248046875
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.operation.duration (s)",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2,db.system.name=postgresql,server.address=127.0.0.1,server.port=5432,Percentile=95",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.010775429861886161,
+      "minimum": 0.002460479736328125,
+      "maximum": 0.05072021484375
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.operation.duration (s)",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2,db.system.name=postgresql,server.address=127.0.0.1,server.port=5432,Percentile=99",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 0.0195037841796875,
+      "minimum": 0.00396728515625,
+      "maximum": 0.0635986328125
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.operation.npgsql.bytes_read (By / 1 sec)",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2",
+      "counter_type": "Rate",
+      "samples": 35,
+      "mean": 8495878.342857143,
+      "minimum": 5667999,
+      "maximum": 11159413
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.operation.npgsql.bytes_written (By / 1 sec)",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2",
+      "counter_type": "Rate",
+      "samples": 35,
+      "mean": 909298.6,
+      "minimum": 582491,
+      "maximum": 1199307
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.operation.npgsql.executing ({command})",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": -5.257142857142857,
+      "minimum": -17,
+      "maximum": 66
+    },
+    {
+      "provider": "Npgsql",
+      "name": "db.client.operation.npgsql.prepared_ratio",
+      "tags": "db.client.connection.pool.name=Host=127.0.0.1;Port=5432;Database=conduit_review_run;Username=postgres;Maximum Pool Size=90;Max Auto Prepare=64;Auto Prepare Min Usages=2",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 99.78682280188121,
+      "minimum": 99.47368421052632,
+      "maximum": 99.97753818508535
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.assembly.count ({assembly})",
+      "tags": "",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 146,
+      "minimum": 146,
+      "maximum": 146
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.collections ({collection} / 1 sec)",
+      "tags": "gc.heap.generation=gen0",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 1.7941176470588236,
+      "minimum": 0,
+      "maximum": 4
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.collections ({collection} / 1 sec)",
+      "tags": "gc.heap.generation=gen1",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 0.47058823529411764,
+      "minimum": 0,
+      "maximum": 1
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.collections ({collection} / 1 sec)",
+      "tags": "gc.heap.generation=gen2",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 0.058823529411764705,
+      "minimum": 0,
+      "maximum": 1
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.heap.total_allocated (By / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 128545907.52941176,
+      "minimum": 115158688,
+      "maximum": 155935736
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.heap.fragmentation.size (By)",
+      "tags": "gc.heap.generation=gen0",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 228257.37142857144,
+      "minimum": 0,
+      "maximum": 4106848
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.heap.fragmentation.size (By)",
+      "tags": "gc.heap.generation=gen1",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 116907.42857142857,
+      "minimum": 14208,
+      "maximum": 692424
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.heap.fragmentation.size (By)",
+      "tags": "gc.heap.generation=gen2",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 2576173.4857142856,
+      "minimum": 512336,
+      "maximum": 14433016
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.heap.fragmentation.size (By)",
+      "tags": "gc.heap.generation=loh",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 160,
+      "minimum": 160,
+      "maximum": 160
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.heap.fragmentation.size (By)",
+      "tags": "gc.heap.generation=poh",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 96761.14285714286,
+      "minimum": 82400,
+      "maximum": 98880
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.heap.size (By)",
+      "tags": "gc.heap.generation=gen0",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 228264.6857142857,
+      "minimum": 0,
+      "maximum": 4107056
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.heap.size (By)",
+      "tags": "gc.heap.generation=gen1",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 7081292.571428572,
+      "minimum": 946712,
+      "maximum": 43777720
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.heap.size (By)",
+      "tags": "gc.heap.generation=gen2",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 150547108.8,
+      "minimum": 112527728,
+      "maximum": 172436576
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.heap.size (By)",
+      "tags": "gc.heap.generation=loh",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 608336,
+      "minimum": 608336,
+      "maximum": 608336
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.heap.size (By)",
+      "tags": "gc.heap.generation=poh",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 1590264,
+      "minimum": 1590264,
+      "maximum": 1590264
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.last_collection.memory.committed_size (By)",
+      "tags": "",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 234804253.25714287,
+      "minimum": 195239936,
+      "maximum": 310288384
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.gc.pause.time (s / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 0.039323911764705885,
+      "minimum": 0.011962000000000028,
+      "maximum": 0.0977300000000001
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.jit.compilation.time (s / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 0.03690972058823531,
+      "minimum": 0,
+      "maximum": 0.16900220000000132
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.jit.compiled_il.size (By / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 3497.529411764706,
+      "minimum": 0,
+      "maximum": 18895
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.jit.compiled_methods ({method} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 43.029411764705884,
+      "minimum": 0,
+      "maximum": 259
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.monitor.lock_contentions ({contention} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 4.5588235294117645,
+      "minimum": 0,
+      "maximum": 13
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.process.cpu.count ({cpu})",
+      "tags": "",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 6,
+      "minimum": 6,
+      "maximum": 6
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.process.cpu.time (s / 1 sec)",
+      "tags": "cpu.mode=system",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 0.5754037647058824,
+      "minimum": 0.41966599999999943,
+      "maximum": 0.7020370000000007
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.process.cpu.time (s / 1 sec)",
+      "tags": "cpu.mode=user",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 1.5570545294117648,
+      "minimum": 1.3993190000000055,
+      "maximum": 1.8364499999999992
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.process.memory.working_set (By)",
+      "tags": "",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 425683938.74285716,
+      "minimum": 381984768,
+      "maximum": 527405056
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.thread_pool.queue.length ({work_item} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": -0.058823529411764705,
+      "minimum": -78,
+      "maximum": 61
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.thread_pool.thread.count ({thread} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": -0.029411764705882353,
+      "minimum": -1,
+      "maximum": 0
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.thread_pool.work_item.count ({work_item} / 1 sec)",
+      "tags": "",
+      "counter_type": "Rate",
+      "samples": 34,
+      "mean": 10090.64705882353,
+      "minimum": 5488,
+      "maximum": 12649
+    },
+    {
+      "provider": "System.Runtime",
+      "name": "dotnet.timer.count ({timer})",
+      "tags": "",
+      "counter_type": "Metric",
+      "samples": 35,
+      "mean": 42.82857142857143,
+      "minimum": 2,
+      "maximum": 803
+    }
+  ],
+  "activity_snapshots": 26,
+  "session_observations": [
+    {
+      "state": "idle",
+      "wait_type": "Client",
+      "wait": "ClientRead",
+      "observations": 2259
+    },
+    {
+      "state": "idle",
+      "wait_type": null,
+      "wait": null,
+      "observations": 24
+    },
+    {
+      "state": "active",
+      "wait_type": null,
+      "wait": null,
+      "observations": 23
+    },
+    {
+      "state": "active",
+      "wait_type": "Client",
+      "wait": "ClientRead",
+      "observations": 17
+    },
+    {
+      "state": "idle in transaction",
+      "wait_type": "Client",
+      "wait": "ClientRead",
+      "observations": 10
+    },
+    {
+      "state": "active",
+      "wait_type": "IO",
+      "wait": "WalSync",
+      "observations": 5
+    },
+    {
+      "state": "active",
+      "wait_type": "LWLock",
+      "wait": "WALWrite",
+      "observations": 2
+    }
+  ],
+  "active_query_observations": [
+    {
+      "query": "SET SESSION AUTHORIZATION DEFAULT;RESET ALL;CLOSE ALL;UNLISTEN *;SELECT pg_advisory_unlock_all();DISCARD SEQUENCES;DISCARD TEMP",
+      "observations": 8
+    },
+    {
+      "query": "SELECT a.slug, a.title, a.description, a.body, COALESCE((\n    SELECT array_agg(s.name ORDER BY s.name)\n    FROM (\n        SELECT t.name, 1 AS \"Key\"\n        FROM article_tags AS a0\n        INNER JOIN tags AS t ON a0.tag_id = t.id\n        WHERE a.id = a0.article_id\n    ) AS s\n    GROUP BY s.\"Key\"\n    LIMIT 1), ARRAY[]::text[]), a.created_at, a.updated_at, EXISTS (\n    SELECT 1\n    FROM favorites AS f\n    WHERE a.id = f.article_id AND f.user_id = $1), (\n    SELECT count(*)::int\n    FROM favorites AS f0\n    WHERE a.id = f0.article_id), u.username, u.bio, u.image, EXISTS (\n    SELECT 1\n    FROM follows AS f1\n    WHERE u.id = f1.followee_id AND f1.follower_id = $1)\nFROM articles AS a\nINNER JOIN users AS u ON a.author_id = u.id\nWHERE a.slug = $2\nLIMIT 2",
+      "observations": 6
+    },
+    {
+      "query": "INSERT INTO favorites (article_id, user_id)\nVALUES ($1, $2)",
+      "observations": 5
+    },
+    {
+      "query": "SELECT a.slug, a.title, a.description, NULL, COALESCE((\n    SELECT array_agg(s.name ORDER BY s.name)\n    FROM (\n        SELECT t0.name, 1 AS \"Key\"\n        FROM article_tags AS a1\n        INNER JOIN tags AS t0 ON a1.tag_id = t0.id\n        WHERE a.id = a1.article_id\n    ) AS s\n    GROUP BY s.\"Key\"\n    LIMIT 1), ARRAY[]::text[]), a.created_at, a.updated_at, EXISTS (\n    SELECT 1\n    FROM favorites AS f\n    WHERE a.id = f.article_id AND f.user_id = $1), (\n    SELECT count(*)::int\n    FROM favorites AS f0\n    WHERE a.id = f0.article_id), u.username, u.bio, u.image, EXISTS (\n    SELECT 1\n    FROM follows AS f1\n    WHERE u.id = f1.followee_id AND f1.follower_id = $1)\nFROM articles AS a\nINNER JOIN users AS u ON a.author_id = u.id\nWHERE a.id IN (\n    SELECT a0.article_id\n    FROM article_tags AS a0\n    WHERE a0.tag_id IN (\n        SELECT t.id\n        FROM tags AS t\n        WHERE t.name = $2\n    )\n    ORDER BY a0.article_id DESC\n    LIMIT $3 OFFSET $4\n)\nORDER BY a.id DESC",
+      "observations": 5
+    },
+    {
+      "query": "SELECT a0.slug, a0.title, a0.description, NULL, COALESCE((\n    SELECT array_agg(s.name ORDER BY s.name)\n    FROM (\n        SELECT t.name, 1 AS \"Key\"\n        FROM article_tags AS a1\n        INNER JOIN tags AS t ON a1.tag_id = t.id\n        WHERE a0.id = a1.article_id\n    ) AS s\n    GROUP BY s.\"Key\"\n    LIMIT 1), ARRAY[]::text[]), a0.created_at, a0.updated_at, EXISTS (\n    SELECT 1\n    FROM favorites AS f\n    WHERE a0.id = f.article_id AND f.user_id = $1), (\n    SELECT count(*)::int\n    FROM favorites AS f0\n    WHERE a0.id = f0.article_id), u.username, u.bio, u.image, EXISTS (\n    SELECT 1\n    FROM follows AS f1\n    WHERE u.id = f1.followee_id AND f1.follower_id = $1)\nFROM (\n    SELECT a.id, a.author_id, a.created_at, a.description, a.slug, a.title, a.updated_at\n    FROM articles AS a\n    ORDER BY a.id DESC\n    LIMIT $2 OFFSET $3\n) AS a0\nINNER JOIN users AS u ON a0.author_id = u.id\nORDER BY a0.id DESC",
+      "observations": 5
+    },
+    {
+      "query": "SELECT a0.id, s.id, s.created_at, s.updated_at, s.body, s.username, s.bio, s.image, s.c, s.id0\nFROM (\n    SELECT a.id\n    FROM articles AS a\n    WHERE a.slug = $1\n    LIMIT 2\n) AS a0\nLEFT JOIN LATERAL (\n    SELECT c0.id, c0.created_at, c0.updated_at, c0.body, u.username, u.bio, u.image, EXISTS (\n        SELECT 1\n        FROM follows AS f\n        WHERE u.id = f.followee_id AND f.follower_id = $2) AS c, u.id AS id0\n    FROM (\n        SELECT c.id, c.author_id, c.body, c.created_at, c.updated_at\n        FROM comments AS c\n        WHERE c.article_id = a0.id\n        ORDER BY c.created_at DESC, c.id DESC\n        LIMIT 100\n    ) AS c0\n    INNER JOIN users AS u ON c0.author_id = u.id\n) AS s ON TRUE\nORDER BY a0.id, s.created_at DESC, s.id DESC",
+      "observations": 4
+    },
+    {
+      "query": "SELECT a1.slug, a1.title, a1.description, NULL, COALESCE((\n    SELECT array_agg(s0.name ORDER BY s0.name)\n    FROM (\n        SELECT t.name, 1 AS \"Key\"\n        FROM article_tags AS a2\n        INNER JOIN tags AS t ON a2.tag_id = t.id\n        WHERE a1.id = a2.article_id\n    ) AS s0\n    GROUP BY s0.\"Key\"\n    LIMIT 1), ARRAY[]::text[]), a1.created_at, a1.updated_at, EXISTS (\n    SELECT 1\n    FROM favorites AS f0\n    WHERE a1.id = f0.article_id AND f0.user_id = s.\"FollowerId\"), (\n    SELECT count(*)::int\n    FROM favorites AS f1\n    WHERE a1.id = f1.article_id), u.username, u.bio, u.image, TRUE\nFROM (\n    SELECT a0.\"Id\", a0.\"FollowerId\"\n    FROM follows AS f\n    JOIN LATERAL (\n        SELECT a.id AS \"Id\", f.follower_id AS \"FollowerId\"\n        FROM articles AS a\n        WHERE a.author_id = f.followee_id\n        ORDER BY a.id DESC\n        LIMIT $1\n    ) AS a0 ON TRUE\n    WHERE f.follower_id = $2\n    ORDER BY a0.\"Id\" DESC\n    LIMIT $3 OFFSET $4\n) AS s\nINNER JOIN articles AS a1 ON s.\"Id\" = a1.id\nINNER JOIN users AS u ",
+      "observations": 3
+    },
+    {
+      "query": "INSERT INTO comments (article_id, author_id, body, created_at, updated_at)\nVALUES ($1, $2, $3, $4, $5)\nRETURNING id",
+      "observations": 2
+    },
+    {
+      "query": "SELECT count(*)::int\nFROM (\n    SELECT 1\n    FROM articles AS a\n    ORDER BY a.id\n    LIMIT 1000\n) AS a0",
+      "observations": 2
+    },
+    {
+      "query": "SELECT count(*)::int\nFROM (\n    SELECT 1\n    FROM follows AS f\n    INNER JOIN articles AS a ON f.followee_id = a.author_id\n    WHERE f.follower_id = $1\n    LIMIT 1000\n) AS s",
+      "observations": 2
+    },
+    {
+      "query": "SELECT u.username, u.bio, u.image, EXISTS (\n    SELECT 1\n    FROM follows AS f\n    WHERE u.id = f.followee_id AND f.follower_id = $1)\nFROM users AS u\nWHERE u.username = $2\nLIMIT 2",
+      "observations": 1
+    },
+    {
+      "query": "SELECT a.slug, a.title, a.description, NULL, COALESCE((\n    SELECT array_agg(s.name ORDER BY s.name)\n    FROM (\n        SELECT t.name, 1 AS \"Key\"\n        FROM article_tags AS a1\n        INNER JOIN tags AS t ON a1.tag_id = t.id\n        WHERE a.id = a1.article_id\n    ) AS s\n    GROUP BY s.\"Key\"\n    LIMIT 1), ARRAY[]::text[]), a.created_at, a.updated_at, EXISTS (\n    SELECT 1\n    FROM favorites AS f\n    WHERE a.id = f.article_id AND f.user_id = $1), (\n    SELECT count(*)::int\n    FROM favorites AS f0\n    WHERE a.id = f0.article_id), u0.username, u0.bio, u0.image, EXISTS (\n    SELECT 1\n    FROM follows AS f1\n    WHERE u0.id = f1.followee_id AND f1.follower_id = $1)\nFROM articles AS a\nINNER JOIN users AS u0 ON a.author_id = u0.id\nWHERE a.id IN (\n    SELECT a0.id\n    FROM articles AS a0\n    WHERE a0.author_id IN (\n        SELECT u.id\n        FROM users AS u\n        WHERE u.username = $2\n    )\n    ORDER BY a0.id DESC\n    LIMIT $3 OFFSET $4\n)\nORDER BY a.id DESC",
+      "observations": 1
+    },
+    {
+      "query": "SELECT u.id, u.bio, u.email, u.image, u.password_hash, u.username\nFROM users AS u\nWHERE u.id = $1\nLIMIT 1",
+      "observations": 1
+    },
+    {
+      "query": "DELETE FROM favorites AS f\nWHERE f.user_id = $1 AND f.article_id = $2",
+      "observations": 1
+    },
+    {
+      "query": "COMMIT",
+      "observations": 1
+    }
+  ]
+}

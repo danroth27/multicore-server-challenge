@@ -1,0 +1,41 @@
+Top 40 Functions (Exclusive)                                                  Inclusive           Exclusive
+1.  LowLevelLifoSemaphore.WaitForSignal(int32)                                25.54%              25.53%
+2.  WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class W    19.19%              19.19%
+3.  Monitor.Wait(class System.Object,int32)                                   9.91%               9.91%
+4.  Missing Symbol                                                            9.35%               9.18%
+5.  Watcher!Interop+Sys.Read(class System.Runtime.InteropServices.SafeHand    4.95%               4.95%
+6.  NpgsqlEventSource.OnEventCommand(class System.Diagnostics.Tracing.Even    4.91%               4.91%
+7.  ManualResetEventSlim.Wait(int32,value class System.Threading.Cancellat    9.84%               4.89%
+8.  Thread.<PollGC>g__PollGCWorker|67_0()                                     3.71%               3.71%
+9.  DynamicResolver+DestroyScout.Finalize()                                   3.32%               3.32%
+10. LowLevelLifoSemaphore.Wait(int32,bool)                                    29.03%              3.09%
+11. Monitor.Enter_Slowpath(class System.Object)                               1.9%                1.9%
+12. BCrypt.Encipher(value class System.Span`1<unsigned int32>,int32)          1.81%               1.81%
+13. PortableThreadPool+WorkerThread.WorkerThreadStart()                       45.18%              1.4%
+14. EventProvider.WriteEvent(value class System.Diagnostics.Tracing.EventD    1.08%               1.05%
+15. GC.RunFinalizers()                                                        4.48%               0.81%
+16. WaitHandle.WaitOne(value class System.TimeSpan)                           0.52%               0.52%
+17. DynamicMethod.CreateDelegate(class System.Type,class System.Object)       0.42%               0.42%
+18. PortableThreadPool+WorkerThread.MaybeAddWorkingWorker(class System.Thr    0.37%               0.37%
+19. SymmetricSignatureProvider.Verify(unsigned int8[],int32,int32,unsigned    0.44%               0.29%
+20. RuntimeHelpers.<GetHashCode>g__GetHashCodeWorker|15_0(class System.Obj    0.23%               0.23%
+21. SocketPal.SysSend(class System.Net.Sockets.SafeSocketHandle,value clas    0.16%               0.16%
+22. BCrypt.Key(value class System.ReadOnlySpan`1<unsigned int8>)              1.9%                0.09%
+23. Cryptography!Interop+Crypto.HmacUpdate(class Microsoft.Win32.SafeHandl    0.08%               0.08%
+24. SqlQueryParser.ParseRawQuery(class Npgsql.NpgsqlCommand,class Npgsql.N    0.13%               0.07%
+25. __Canon].MoveNext()                                                       7.7%                0.07%
+26. HashProviderDispenser+HmacHashProvider.FinalizeHashAndReset(value clas    0.07%               0.07%
+27. EncodingExtensions.GetString(class System.Text.Encoding,value class Sy    0.06%               0.04%
+28. DependencyInjection!dynamicClass.ResolveService(pMT: 0x7466ae5ff248,pM    0.57%               0.04%
+29. Buffer.MemmoveInternal(unsigned int8&,unsigned int8&,unsigned int)        0.03%               0.03%
+30. Boolean].GetStateMachineBox(!!0&,class System.Threading.Tasks.Task`1<!    0.1%                0.03%
+31. JwtBearerHandler+<HandleAuthenticateAsync>d__6.MoveNext()                 0.76%               0.03%
+32. StringBuilder.ToString()                                                  0.05%               0.03%
+33. EventPipeEventProvider.EventWriteTransfer(required_modifier System.Run    0.03%               0.03%
+34. String.Ctor(value class System.ReadOnlySpan`1<wchar>)                     0.03%               0.02%
+35. __Canon].GetStateMachineBox(!!0&,class System.Threading.Tasks.Task`1<!    0.19%               0.02%
+36. RelationalCommand.CreateDbCommand(value class Microsoft.EntityFramewor    0.13%               0.02%
+37. __Canon].OnTryWrite(class System.Text.Json.Utf8JsonWriter,!0,class Sys    0.42%               0.02%
+38. AsyncLocalValueMap+TwoElementAsyncLocalValueMap.Set(class System.Threa    0.02%               0.02%
+39. Lock.TryEnterSlow(int32,value class ThreadId)                             0.04%               0.02%
+40. SocketAsyncContext.TryRegister(value class Error&)                        0.02%               0.02%

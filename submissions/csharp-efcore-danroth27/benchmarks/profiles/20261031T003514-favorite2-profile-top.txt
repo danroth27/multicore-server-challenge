@@ -1,0 +1,41 @@
+Top 40 Functions (Exclusive)                                                  Inclusive           Exclusive
+1.  WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class W    19.91%              19.91%
+2.  LowLevelLifoSemaphore.WaitForSignal(int32)                                15.37%              15.37%
+3.  Missing Symbol                                                            12.15%              11.86%
+4.  Monitor.Wait(class System.Object,int32)                                   10.25%              10.25%
+5.  Thread.<PollGC>g__PollGCWorker|67_0()                                     5.58%               5.58%
+6.  Watcher!Interop+Sys.Read(class System.Runtime.InteropServices.SafeHand    5.12%               5.12%
+7.  NpgsqlEventSource.OnEventCommand(class System.Diagnostics.Tracing.Even    5.08%               5.08%
+8.  ManualResetEventSlim.Wait(int32,value class System.Threading.Cancellat    10.09%              4.97%
+9.  BCrypt.Encipher(value class System.Span`1<unsigned int32>,int32)          3.81%               3.81%
+10. Monitor.Enter_Slowpath(class System.Object)                               2.63%               2.63%
+11. PortableThreadPool+WorkerThread.WorkerThreadStart()                       44.4%               2.14%
+12. DynamicResolver+DestroyScout.Finalize()                                   1.96%               1.96%
+13. EventProvider.WriteEvent(value class System.Diagnostics.Tracing.EventD    1.91%               1.88%
+14. LowLevelLifoSemaphore.Wait(int32,bool)                                    17.17%              1.74%
+15. GC.RunFinalizers()                                                        2.77%               0.81%
+16. DynamicMethod.CreateDelegate(class System.Type,class System.Object)       0.76%               0.76%
+17. WaitHandle.WaitOne(value class System.TimeSpan)                           0.54%               0.54%
+18. SymmetricSignatureProvider.Verify(unsigned int8[],int32,int32,unsigned    0.62%               0.4%
+19. SocketPal.SysSend(class System.Net.Sockets.SafeSocketHandle,value clas    0.35%               0.35%
+20. RuntimeHelpers.<GetHashCode>g__GetHashCodeWorker|15_0(class System.Obj    0.32%               0.32%
+21. SqlQueryParser.ParseRawQuery(class Npgsql.NpgsqlCommand,class Npgsql.N    0.24%               0.17%
+22. BCrypt.Key(value class System.ReadOnlySpan`1<unsigned int8>)              3.98%               0.17%
+23. PortableThreadPool+WorkerThread.MaybeAddWorkingWorker(class System.Thr    0.16%               0.16%
+24. HashProviderDispenser+HmacHashProvider.FinalizeHashAndReset(value clas    0.12%               0.12%
+25. Guid.NewGuid()                                                            0.11%               0.11%
+26. Cryptography!Interop+Crypto.HmacUpdate(class Microsoft.Win32.SafeHandl    0.1%                0.1%
+27. __Canon].MoveNext()                                                       11.75%              0.09%
+28. __Canon].OnTryWrite(class System.Text.Json.Utf8JsonWriter,!0,class Sys    0.71%               0.06%
+29. NpgsqlDataReader+<NextResult>d__52.MoveNext()                             10.82%              0.06%
+30. Lock.TryEnterSlow(int32,value class ThreadId)                             0.13%               0.06%
+31. EncodingExtensions.GetString(class System.Text.Encoding,value class Sy    0.08%               0.05%
+32. RelationalCommand.CreateDbCommand(value class Microsoft.EntityFramewor    0.26%               0.05%
+33. NpgsqlCommand+<ExecuteReader>d__122.MoveNext()                            15.79%              0.05%
+34. Buffer.MemmoveInternal(unsigned int8&,unsigned int8&,unsigned int)        0.05%               0.05%
+35. Monitor.Exit_Slowpath(value class LeaveHelperAction,class System.Objec    0.05%               0.05%
+36. KestrelConnection.TickHeartbeat()                                         0.15%               0.05%
+37. VirtualDispatchHelpers.VirtualFunctionPointer(class System.Object,int,    0.05%               0.05%
+38. __Canon].GetAggregator(value class System.ReadOnlySpan`1<value class S    0.04%               0.04%
+39. CastHelpers.IsInstanceOfInterface(void*,class System.Object)              0.04%               0.04%
+40. JwtBearerHandler+<HandleAuthenticateAsync>d__6.MoveNext()                 1.04%               0.04%

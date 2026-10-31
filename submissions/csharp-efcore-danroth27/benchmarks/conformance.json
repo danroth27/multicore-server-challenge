@@ -1,0 +1,74 @@
+[
+  {
+    "run": "20261030T212425-baseline-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (5.0s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T212441-prepared-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.4s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T213043-linq-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (3.9s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T213115-aggregate-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.2s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T213137-comments-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (3.9s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T213212-oldest-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.1s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T214245-compiled-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.1s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T214631-utf8-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.7s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T214644-json-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.2s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T220258-join-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.0s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T222830-held32-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.0s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T223016-upsert32-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.0s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T223026-workstation32-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.0s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T225211-clean-held-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.8s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T225422-release32-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.1s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T225431-baseline-final-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.5s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T234903-baseline-final-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.3s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261030T234913-favorite2-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (4.0s)\nRESULT: PASS"
+  }
+]

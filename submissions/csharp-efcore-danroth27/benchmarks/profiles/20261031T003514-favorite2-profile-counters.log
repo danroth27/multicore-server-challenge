@@ -1,0 +1,4 @@
+Starting a counter session. Press Q to quit.
+Warning: Histogram tracking limit (10) reached. Not all data is being shown.
+The limit can be changed with --maxHistograms but will use more memory in the target process.
+File saved to /study/profiles/20261031T003514-favorite2-profile-counters.json

@@ -1,0 +1,48 @@
+diff --git a/Data/ConduitDb.cs b/Data/ConduitDb.cs
+--- a/Data/ConduitDb.cs
++++ b/Data/ConduitDb.cs
+@@ -93,9 +93,9 @@
+ 
+ public static class ConduitDbSetup
+ {
+-    public static IServiceCollection AddConduitDb(this IServiceCollection services, string databaseUrl) =>
++    public static IServiceCollection AddConduitDb(this IServiceCollection services, string databaseUrl, IConfiguration configuration) =>
+         services.AddDbContextPool<ConduitDb>(db => db
+-            .UseNpgsql(ConnectionString(databaseUrl))
++            .UseNpgsql(ConnectionString(databaseUrl, configuration))
+             .UseSnakeCaseNamingConvention()
+             // A duplicate that SaveIgnoringDuplicatesAsync expects is not an error. Real failures still reach the
+             // exception handler, which logs them.
+@@ -104,7 +104,7 @@
+                 (RelationalEventId.CommandError, LogLevel.Debug))));
+ 
+     /// <summary>Turns postgres://user:password@host:port/database into an Npgsql connection string.</summary>
+-    static string ConnectionString(string databaseUrl)
++    static string ConnectionString(string databaseUrl, IConfiguration configuration)
+     {
+         var url = new Uri(databaseUrl);
+         var credentials = url.UserInfo.Split(':', 2).Select(Uri.UnescapeDataString).ToArray();
+@@ -115,7 +115,10 @@
+             Database = url.AbsolutePath.Trim('/'),
+             Username = credentials[0],
+             Password = credentials.ElementAtOrDefault(1),
+-            MaxPoolSize = 90, // Postgres allows 100 connections; leave a few for psql.
++            MaxPoolSize = configuration.GetValue("DB_POOL_SIZE", 90),
++            MaxAutoPrepare = configuration.GetValue("DB_MAX_AUTO_PREPARE", 64),
++            AutoPrepareMinUsages = configuration.GetValue("DB_AUTO_PREPARE_MIN_USAGES", 2),
++            Options = configuration["DB_OPTIONS"],
+         }.ConnectionString;
+     }
+ }
+diff --git a/Program.cs b/Program.cs
+--- a/Program.cs
++++ b/Program.cs
+@@ -10,7 +10,7 @@
+ builder.Logging.SetMinimumLevel(LogLevel.Warning);
+ 
+ builder.Services
+-    .AddConduitDb(settings.DatabaseUrl)
++    .AddConduitDb(settings.DatabaseUrl, builder.Configuration)
+     .AddTokenAuth(settings.JwtSecret)
+     .AddRealWorldErrors()
+     .AddValidation()

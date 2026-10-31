@@ -1,0 +1,513 @@
+diff --git a/Api/ArticlesApi.cs b/Api/ArticlesApi.cs
+--- a/Api/ArticlesApi.cs
++++ b/Api/ArticlesApi.cs
+@@ -22,20 +22,59 @@
+         return api;
+     }
+ 
+-    static Task<Ok<ArticlesResponse>> List(
+-        [AsParameters] ArticleFilter filter, Page page, Viewer viewer, ConduitDb db, CancellationToken ct) =>
+-        Paged(filter.Apply(db), page, viewer, ct);
++    static async Task<Ok<ArticlesResponse>> List(
++        [AsParameters] ArticleFilter filter, Page page, Viewer viewer, ConduitDb db, CancellationToken ct)
++    {
++        (IAsyncEnumerable<ArticleView> Rows, string Key, Func<ConduitDb, string, CancellationToken, Task<int>>? Count) query =
++            filter switch
++            {
++                { Tag: { Length: > 0 } tag } =>
++                    (ReadQueries.TagPage(db, tag, viewer.Id, page.Limit, page.Offset), tag, ReadQueries.TagCount),
++                { Author: { Length: > 0 } author } =>
++                    (ReadQueries.AuthorPage(db, author, viewer.Id, page.Limit, page.Offset), author, ReadQueries.AuthorCount),
++                { Favorited: { Length: > 0 } username } =>
++                    (ReadQueries.FavoritedPage(db, username, viewer.Id, page.Limit, page.Offset), username, ReadQueries.FavoritedCount),
++                _ => (ReadQueries.GlobalPage(db, viewer.Id, page.Limit, page.Offset), "", null)
++            };
++        await db.Database.OpenConnectionAsync(ct);
++        try
++        {
++            var articles = await query.Rows.ToListAsync(ct);
++            var count = query.Count is null ? await ReadQueries.GlobalCount(db, ct) : await query.Count(db, query.Key, ct);
++            return TypedResults.Ok(new ArticlesResponse(articles, count));
++        }
++        finally
++        {
++            await db.Database.CloseConnectionAsync();
++        }
++    }
+ 
+-    static Task<Ok<ArticlesResponse>> Feed(Page page, Viewer viewer, ConduitDb db, CancellationToken ct) =>
+-        Paged(db.Follows.Where(f => f.FollowerId == viewer.Id).SelectMany(f => f.Followee.Articles), page, viewer, ct);
++    static async Task<Ok<ArticlesResponse>> Feed(Page page, Viewer viewer, ConduitDb db, CancellationToken ct)
++    {
++        if (page.Offset > int.MaxValue - page.Limit)
++        {
++            var allIds = db.Follows.Where(f => f.FollowerId == viewer.Id)
++                .SelectMany(f => db.Articles.Where(a => a.AuthorId == f.FolloweeId)).Select(a => a.Id);
++            return await Paged(allIds, page, viewer, db, ct);
++        }
++
++        await db.Database.OpenConnectionAsync(ct);
++        try
++        {
++            var articles = await ReadQueries.FeedPage(db, viewer.Id, page.Limit + page.Offset, page.Limit, page.Offset).ToListAsync(ct);
++            var count = await ReadQueries.FeedCount(db, viewer.Id, ct);
++            return TypedResults.Ok(new ArticlesResponse(articles, count));
++        }
++        finally
++        {
++            await db.Database.CloseConnectionAsync();
++        }
++    }
+ 
+     static async Task<Results<Ok<ArticleResponse>, ProblemHttpResult>> Get(
+         string slug, Viewer viewer, ConduitDb db, CancellationToken ct)
+     {
+-        var article = await db.Articles
+-            .Where(a => a.Slug == slug)
+-            .Select(Projections.Article(viewer.Id))
+-            .SingleOrDefaultAsync(ct);
++        var article = await ReadQueries.ArticleBySlug(db, slug, viewer.Id, ct);
+         if (article is null) return Errors.NotFound;
+ 
+         return TypedResults.Ok(new ArticleResponse(article));
+@@ -106,19 +145,19 @@
+     }
+ 
+     /// <summary>One page, newest first, and the total capped at 1,000.</summary>
+-    static async Task<Ok<ArticlesResponse>> Paged(IQueryable<Article> articles, Page page, Viewer viewer, CancellationToken ct)
++    static async Task<Ok<ArticlesResponse>> Paged(
++        IQueryable<long> ids, Page page, Viewer viewer, ConduitDb db, CancellationToken ct)
+     {
+-        var list = await articles
++        var pageIds = ids.OrderByDescending(id => id).Skip(page.Offset).Take(page.Limit);
++        var list = await db.Articles.Where(a => pageIds.Contains(a.Id))
+             .OrderByDescending(a => a.Id)
+-            .Skip(page.Offset)
+-            .Take(page.Limit)
+             .Select(Projections.Article(viewer.Id, includeBody: false))
+             .ToListAsync(ct);
+-        var count = await articles.Take(MaxCount).CountAsync(ct);
++        var count = await ids.Take(MaxCount).CountAsync(ct);
+ 
+         return TypedResults.Ok(new ArticlesResponse(list, count));
+     }
+ 
+     static Task<ArticleView> Find(ConduitDb db, long id, Viewer viewer, CancellationToken ct) =>
+-        db.Articles.Where(a => a.Id == id).Select(Projections.Article(viewer.Id)).SingleAsync(ct);
++        ReadQueries.ArticleById(db, id, viewer.Id, ct);
+ }
+diff --git a/Api/CommentsApi.cs b/Api/CommentsApi.cs
+--- a/Api/CommentsApi.cs
++++ b/Api/CommentsApi.cs
+@@ -7,8 +7,6 @@
+ 
+ public static class CommentsApi
+ {
+-    const int MaxComments = 100;
+-
+     public static RouteGroupBuilder MapCommentsApi(this RouteGroupBuilder api)
+     {
+         api.MapGet("/articles/{slug}/comments", List).AuthOptional();
+@@ -20,17 +18,8 @@
+     static async Task<Results<Ok<CommentsResponse>, ProblemHttpResult>> List(
+         string slug, Viewer viewer, ConduitDb db, CancellationToken ct)
+     {
+-        var articleId = await db.ArticleIdAsync(slug, ct);
+-        if (articleId is null) return Errors.NotFound;
+-
+-        var comments = await db.Comments
+-            .Where(c => c.ArticleId == articleId)
+-            .OrderByDescending(c => c.CreatedAt).ThenByDescending(c => c.Id)
+-            .Take(MaxComments)
+-            .Select(Projections.Comment(viewer.Id))
+-            .ToListAsync(ct);
+-
+-        return TypedResults.Ok(new CommentsResponse(comments));
++        var response = await ReadQueries.Comments(db, slug, viewer.Id, ct);
++        return response is null ? Errors.NotFound : TypedResults.Ok(response);
+     }
+ 
+     static async Task<Results<Created<CommentResponse>, ProblemHttpResult>> Create(
+diff --git a/Api/ConduitJsonContext.cs b/Api/ConduitJsonContext.cs
+new file mode 100644
+--- /dev/null
++++ b/Api/ConduitJsonContext.cs
+@@ -0,0 +1,21 @@
++using System.Text.Json;
++using System.Text.Json.Serialization;
++
++namespace Conduit.Api;
++
++[JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
++[JsonSerializable(typeof(UserResponse))]
++[JsonSerializable(typeof(ProfileResponse))]
++[JsonSerializable(typeof(ArticleResponse))]
++[JsonSerializable(typeof(ArticlesResponse))]
++[JsonSerializable(typeof(CommentResponse))]
++[JsonSerializable(typeof(CommentsResponse))]
++[JsonSerializable(typeof(TagsResponse))]
++[JsonSerializable(typeof(ErrorResponse))]
++[JsonSerializable(typeof(RegisterRequest))]
++[JsonSerializable(typeof(LoginRequest))]
++[JsonSerializable(typeof(UpdateUserRequest))]
++[JsonSerializable(typeof(NewArticleRequest))]
++[JsonSerializable(typeof(UpdateArticleRequest))]
++[JsonSerializable(typeof(NewCommentRequest))]
++internal partial class ConduitJsonContext : JsonSerializerContext;
+diff --git a/Api/ProfilesApi.cs b/Api/ProfilesApi.cs
+--- a/Api/ProfilesApi.cs
++++ b/Api/ProfilesApi.cs
+@@ -18,10 +18,7 @@
+     static async Task<Results<Ok<ProfileResponse>, ProblemHttpResult>> Get(
+         string username, Viewer viewer, ConduitDb db, CancellationToken ct)
+     {
+-        var profile = await db.Users
+-            .Where(u => u.Username == username)
+-            .Select(Projections.Profile(viewer.Id))
+-            .SingleOrDefaultAsync(ct);
++        var profile = await ReadQueries.Profile(db, username, viewer.Id, ct);
+         if (profile is null) return Errors.NotFound;
+ 
+         return TypedResults.Ok(new ProfileResponse(profile));
+diff --git a/Api/ReadQueries.cs b/Api/ReadQueries.cs
+new file mode 100644
+--- /dev/null
++++ b/Api/ReadQueries.cs
+@@ -0,0 +1,130 @@
++using System.Linq.Expressions;
++using Conduit.Data;
++using Microsoft.EntityFrameworkCore;
++
++namespace Conduit.Api;
++
++internal static class ReadQueries
++{
++    const int MaxCount = 1000;
++
++    sealed class ArticleSource
++    {
++        public required Article Article { get; init; }
++        public long ViewerId { get; init; }
++        public bool IncludeBody { get; init; }
++        public bool? Following { get; init; }
++    }
++
++    static readonly Expression<Func<ArticleSource, ArticleView>> View = source => new(
++        source.Article.Slug, source.Article.Title, source.Article.Description,
++        source.IncludeBody ? source.Article.Body : null,
++        source.Article.Tags.GroupBy(t => 1)
++            .Select(g => EF.Functions.ArrayAgg(g.OrderBy(t => t.Name).Select(t => t.Name)))
++            .FirstOrDefault() ?? Array.Empty<string>(),
++        source.Article.CreatedAt, source.Article.UpdatedAt,
++        source.Article.Favorites.Any(f => f.UserId == source.ViewerId),
++        source.Article.Favorites.Count,
++        new ProfileView(source.Article.Author.Username, source.Article.Author.Bio, source.Article.Author.Image,
++            source.Following ?? source.Article.Author.Followers.Any(f => f.FollowerId == source.ViewerId)));
++
++    public static readonly Func<ConduitDb, string, long, CancellationToken, Task<ArticleView?>> ArticleBySlug =
++        EF.CompileAsyncQuery((ConduitDb db, string slug, long viewer, CancellationToken ct) =>
++            db.Articles.Where(a => a.Slug == slug)
++                .Select(a => new ArticleSource { Article = a, ViewerId = viewer, IncludeBody = true, Following = null })
++                .Select(View).SingleOrDefault());
++
++    public static readonly Func<ConduitDb, long, long, CancellationToken, Task<ArticleView>> ArticleById =
++        EF.CompileAsyncQuery((ConduitDb db, long id, long viewer, CancellationToken ct) =>
++            db.Articles.Where(a => a.Id == id)
++                .Select(a => new ArticleSource { Article = a, ViewerId = viewer, IncludeBody = true, Following = null })
++                .Select(View).Single());
++
++    public static readonly Func<ConduitDb, long, int, int, IAsyncEnumerable<ArticleView>> GlobalPage =
++        EF.CompileAsyncQuery((ConduitDb db, long viewer, int limit, int offset) =>
++            db.Articles.OrderByDescending(a => a.Id).Skip(offset).Take(limit)
++                .Select(a => new ArticleSource { Article = a, ViewerId = viewer, IncludeBody = false, Following = null })
++                .Select(View));
++
++    public static readonly Func<ConduitDb, string, long, int, int, IAsyncEnumerable<ArticleView>> TagPage =
++        EF.CompileAsyncQuery((ConduitDb db, string tag, long viewer, int limit, int offset) =>
++            db.Articles.Where(a => db.ArticleTags
++                    .Where(at => db.Tags.Where(t => t.Name == tag).Select(t => t.Id).Contains(at.TagId))
++                    .OrderByDescending(at => at.ArticleId).Skip(offset).Take(limit).Select(at => at.ArticleId).Contains(a.Id))
++                .OrderByDescending(a => a.Id)
++                .Select(a => new ArticleSource { Article = a, ViewerId = viewer, IncludeBody = false, Following = null })
++                .Select(View));
++
++    public static readonly Func<ConduitDb, string, long, int, int, IAsyncEnumerable<ArticleView>> AuthorPage =
++        EF.CompileAsyncQuery((ConduitDb db, string author, long viewer, int limit, int offset) =>
++            db.Articles.Where(a => db.Articles
++                    .Where(p => db.Users.Where(u => u.Username == author).Select(u => u.Id).Contains(p.AuthorId))
++                    .OrderByDescending(p => p.Id).Skip(offset).Take(limit).Select(p => p.Id).Contains(a.Id))
++                .OrderByDescending(a => a.Id)
++                .Select(a => new ArticleSource { Article = a, ViewerId = viewer, IncludeBody = false, Following = null })
++                .Select(View));
++
++    public static readonly Func<ConduitDb, string, long, int, int, IAsyncEnumerable<ArticleView>> FavoritedPage =
++        EF.CompileAsyncQuery((ConduitDb db, string username, long viewer, int limit, int offset) =>
++            db.Articles.Where(a => db.Favorites
++                    .Where(f => db.Users.Where(u => u.Username == username).Select(u => u.Id).Contains(f.UserId))
++                    .OrderByDescending(f => f.ArticleId).Skip(offset).Take(limit).Select(f => f.ArticleId).Contains(a.Id))
++                .OrderByDescending(a => a.Id)
++                .Select(a => new ArticleSource { Article = a, ViewerId = viewer, IncludeBody = false, Following = null })
++                .Select(View));
++
++    public static readonly Func<ConduitDb, long, int, int, int, IAsyncEnumerable<ArticleView>> FeedPage =
++        EF.CompileAsyncQuery((ConduitDb db, long viewer, int budget, int limit, int offset) =>
++            db.Follows.Where(f => f.FollowerId == viewer)
++                .SelectMany(f => db.Articles.Where(a => a.AuthorId == f.FolloweeId)
++                    .OrderByDescending(a => a.Id).Take(budget).Select(a => new { a.Id, f.FollowerId }))
++                .OrderByDescending(a => a.Id).Skip(offset).Take(limit)
++                .Join(db.Articles, p => p.Id, a => a.Id,
++                    (p, a) => new ArticleSource { Article = a, ViewerId = p.FollowerId, IncludeBody = false, Following = true })
++                .OrderByDescending(a => a.Article.Id)
++                .Select(View));
++
++    public static readonly Func<ConduitDb, CancellationToken, Task<int>> GlobalCount =
++        EF.CompileAsyncQuery((ConduitDb db, CancellationToken ct) =>
++            db.Articles.OrderBy(a => a.Id).Take(MaxCount).Count());
++
++    public static readonly Func<ConduitDb, string, CancellationToken, Task<int>> TagCount =
++        EF.CompileAsyncQuery((ConduitDb db, string tag, CancellationToken ct) =>
++            db.ArticleTags.Where(at => db.Tags.Where(t => t.Name == tag).Select(t => t.Id).Contains(at.TagId))
++                .Take(MaxCount).Count());
++
++    public static readonly Func<ConduitDb, string, CancellationToken, Task<int>> AuthorCount =
++        EF.CompileAsyncQuery((ConduitDb db, string author, CancellationToken ct) =>
++            db.Articles.Where(a => db.Users.Where(u => u.Username == author).Select(u => u.Id).Contains(a.AuthorId))
++                .Take(MaxCount).Count());
++
++    public static readonly Func<ConduitDb, string, CancellationToken, Task<int>> FavoritedCount =
++        EF.CompileAsyncQuery((ConduitDb db, string username, CancellationToken ct) =>
++            db.Favorites.Where(f => db.Users.Where(u => u.Username == username).Select(u => u.Id).Contains(f.UserId))
++                .Take(MaxCount).Count());
++
++    public static readonly Func<ConduitDb, long, CancellationToken, Task<int>> FeedCount =
++        EF.CompileAsyncQuery((ConduitDb db, long viewer, CancellationToken ct) =>
++            db.Follows.Where(f => f.FollowerId == viewer)
++                .SelectMany(f => db.Articles.Where(a => a.AuthorId == f.FolloweeId)).Take(MaxCount).Count());
++
++    public static readonly Func<ConduitDb, string, long, CancellationToken, Task<ProfileView?>> Profile =
++        EF.CompileAsyncQuery((ConduitDb db, string username, long viewer, CancellationToken ct) =>
++            db.Users.Where(u => u.Username == username)
++                .Select(u => new ProfileView(u.Username, u.Bio, u.Image, u.Followers.Any(f => f.FollowerId == viewer)))
++                .SingleOrDefault());
++
++    public static readonly Func<ConduitDb, string, long, CancellationToken, Task<CommentsResponse?>> Comments =
++        EF.CompileAsyncQuery((ConduitDb db, string slug, long viewer, CancellationToken ct) =>
++            db.Articles.Where(a => a.Slug == slug)
++                .Select(a => new CommentsResponse(db.Comments.Where(c => c.ArticleId == a.Id)
++                    .OrderByDescending(c => c.CreatedAt).ThenByDescending(c => c.Id).Take(100)
++                    .Select(c => new CommentView(c.Id, c.CreatedAt, c.UpdatedAt, c.Body,
++                        new ProfileView(c.Author.Username, c.Author.Bio, c.Author.Image,
++                            c.Author.Followers.Any(f => f.FollowerId == viewer))))
++                    .ToList()))
++                .SingleOrDefault());
++
++    public static readonly Func<ConduitDb, IAsyncEnumerable<string>> Tags =
++        EF.CompileAsyncQuery((ConduitDb db) => db.Tags.OrderBy(t => t.Name).Select(t => t.Name));
++}
+diff --git a/Api/Requests.cs b/Api/Requests.cs
+--- a/Api/Requests.cs
++++ b/Api/Requests.cs
+@@ -58,12 +58,19 @@
+ /// <summary>GET /api/articles filters. Only the first one given applies, in this order.</summary>
+ public record ArticleFilter(string? Tag, string? Author, string? Favorited)
+ {
+-    public IQueryable<Article> Apply(ConduitDb db)
++    public IQueryable<long> ApplyIds(ConduitDb db)
+     {
+-        if (!string.IsNullOrEmpty(Tag)) return db.Tags.Where(t => t.Name == Tag).SelectMany(t => t.Articles);
+-        if (!string.IsNullOrEmpty(Author)) return db.Articles.Where(a => a.Author.Username == Author);
+-        if (!string.IsNullOrEmpty(Favorited)) return db.Favorites.Where(f => f.User.Username == Favorited).Select(f => f.Article);
+-        return db.Articles;
++        if (!string.IsNullOrEmpty(Tag))
++            return db.ArticleTags.Where(at => db.Tags.Where(t => t.Name == Tag).Select(t => t.Id).Contains(at.TagId))
++                .Select(at => at.ArticleId);
++        if (!string.IsNullOrEmpty(Author))
++            return db.Articles.Where(a => db.Users.Where(u => u.Username == Author).Select(u => u.Id).Contains(a.AuthorId))
++                .Select(a => a.Id);
++        if (!string.IsNullOrEmpty(Favorited))
++            return db.Favorites.Where(f => db.Users.Where(u => u.Username == Favorited).Select(u => u.Id).Contains(f.UserId))
++                .Select(f => f.ArticleId);
++        // Oldest rows are more likely to remain all-visible for the capped count.
++        return db.Articles.OrderBy(a => a.Id).Select(a => a.Id);
+     }
+ }
+ 
+diff --git a/Api/TagsApi.cs b/Api/TagsApi.cs
+--- a/Api/TagsApi.cs
++++ b/Api/TagsApi.cs
+@@ -14,7 +14,7 @@
+ 
+     static async Task<Ok<TagsResponse>> List(ConduitDb db, CancellationToken ct)
+     {
+-        var tags = await db.Tags.OrderBy(t => t.Name).Select(t => t.Name).ToListAsync(ct);
++        var tags = await ReadQueries.Tags(db).ToListAsync(ct);
+         return TypedResults.Ok(new TagsResponse(tags));
+     }
+ }
+diff --git a/Api/UtcMillisConverter.cs b/Api/UtcMillisConverter.cs
+--- a/Api/UtcMillisConverter.cs
++++ b/Api/UtcMillisConverter.cs
+@@ -12,6 +12,11 @@
+     public override DateTime Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options) =>
+         reader.GetDateTime();
+ 
+-    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options) =>
+-        writer.WriteStringValue(value.ToUniversalTime().ToString(Format, CultureInfo.InvariantCulture));
++    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
++    {
++        Span<byte> timestamp = stackalloc byte[24];
++        if (!value.ToUniversalTime().TryFormat(timestamp, out var written, Format, CultureInfo.InvariantCulture))
++            throw new InvalidOperationException("The UTC timestamp did not fit its fixed-width buffer.");
++        writer.WriteStringValue(timestamp[..written]);
++    }
+ }
+diff --git a/Api/Views.cs b/Api/Views.cs
+--- a/Api/Views.cs
++++ b/Api/Views.cs
+@@ -1,6 +1,7 @@
+ using System.Linq.Expressions;
+ using System.Text.Json.Serialization;
+ using Conduit.Data;
++using Microsoft.EntityFrameworkCore;
+ 
+ namespace Conduit.Api;
+ 
+@@ -19,7 +20,7 @@
+     string Title,
+     string Description,
+     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Body,
+-    List<string> TagList,
++    string[] TagList,
+     DateTime CreatedAt,
+     DateTime UpdatedAt,
+     bool Favorited,
+@@ -45,7 +46,9 @@
+         article.Title,
+         article.Description,
+         includeBody ? article.Body : null,
+-        article.Tags.OrderBy(t => t.Name).Select(t => t.Name).ToList(),
++        article.Tags.GroupBy(t => 1)
++            .Select(g => EF.Functions.ArrayAgg(g.OrderBy(t => t.Name).Select(t => t.Name)))
++            .FirstOrDefault() ?? Array.Empty<string>(),
+         article.CreatedAt,
+         article.UpdatedAt,
+         article.Favorites.Any(f => f.UserId == viewerId),
+diff --git a/Conduit.csproj b/Conduit.csproj
+--- a/Conduit.csproj
++++ b/Conduit.csproj
+@@ -11,6 +11,7 @@
+   </PropertyGroup>
+ 
+   <ItemGroup>
++    <Content Remove="benchmarks\**" />
+     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+     <PackageReference Include="EFCore.NamingConventions" Version="10.0.1" />
+     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
+diff --git a/Data/ConduitDb.cs b/Data/ConduitDb.cs
+--- a/Data/ConduitDb.cs
++++ b/Data/ConduitDb.cs
+@@ -10,6 +10,7 @@
+     public DbSet<Follow> Follows => Set<Follow>();
+     public DbSet<Article> Articles => Set<Article>();
+     public DbSet<Tag> Tags => Set<Tag>();
++    public DbSet<ArticleTag> ArticleTags => Set<ArticleTag>();
+     public DbSet<Favorite> Favorites => Set<Favorite>();
+     public DbSet<Comment> Comments => Set<Comment>();
+ 
+@@ -24,10 +25,10 @@
+         model.HasSequence<long>("articles_id_seq").IncrementsBy(1);
+         model.Entity<Article>().Property(a => a.Id).UseHiLo("articles_id_seq");
+ 
+-        model.Entity<Article>().HasMany(a => a.Tags).WithMany(t => t.Articles).UsingEntity(
+-            "article_tags",
+-            tag => tag.HasOne(typeof(Tag)).WithMany().HasForeignKey("tag_id"),
+-            article => article.HasOne(typeof(Article)).WithMany().HasForeignKey("article_id"));
++        model.Entity<Article>().HasMany(a => a.Tags).WithMany(t => t.Articles).UsingEntity<ArticleTag>(
++            tag => tag.HasOne<Tag>().WithMany().HasForeignKey(t => t.TagId),
++            article => article.HasOne<Article>().WithMany().HasForeignKey(t => t.ArticleId),
++            link => link.ToTable("article_tags").HasKey(t => new { t.ArticleId, t.TagId }));
+     }
+ 
+     public Task<long?> ArticleIdAsync(string slug, CancellationToken ct) =>
+@@ -93,9 +94,9 @@
+ 
+ public static class ConduitDbSetup
+ {
+-    public static IServiceCollection AddConduitDb(this IServiceCollection services, string databaseUrl) =>
++    public static IServiceCollection AddConduitDb(this IServiceCollection services, string databaseUrl, IConfiguration configuration) =>
+         services.AddDbContextPool<ConduitDb>(db => db
+-            .UseNpgsql(ConnectionString(databaseUrl))
++            .UseNpgsql(ConnectionString(databaseUrl, configuration))
+             .UseSnakeCaseNamingConvention()
+             // A duplicate that SaveIgnoringDuplicatesAsync expects is not an error. Real failures still reach the
+             // exception handler, which logs them.
+@@ -104,7 +105,7 @@
+                 (RelationalEventId.CommandError, LogLevel.Debug))));
+ 
+     /// <summary>Turns postgres://user:password@host:port/database into an Npgsql connection string.</summary>
+-    static string ConnectionString(string databaseUrl)
++    static string ConnectionString(string databaseUrl, IConfiguration configuration)
+     {
+         var url = new Uri(databaseUrl);
+         var credentials = url.UserInfo.Split(':', 2).Select(Uri.UnescapeDataString).ToArray();
+@@ -115,7 +116,10 @@
+             Database = url.AbsolutePath.Trim('/'),
+             Username = credentials[0],
+             Password = credentials.ElementAtOrDefault(1),
+-            MaxPoolSize = 90, // Postgres allows 100 connections; leave a few for psql.
++            MaxPoolSize = configuration.GetValue("DB_POOL_SIZE", 90),
++            MaxAutoPrepare = configuration.GetValue("DB_MAX_AUTO_PREPARE", 64),
++            AutoPrepareMinUsages = configuration.GetValue("DB_AUTO_PREPARE_MIN_USAGES", 2),
++            Options = configuration["DB_OPTIONS"],
+         }.ConnectionString;
+     }
+ }
+diff --git a/Data/Entities.cs b/Data/Entities.cs
+--- a/Data/Entities.cs
++++ b/Data/Entities.cs
+@@ -57,6 +57,12 @@
+     public List<Article> Articles { get; set; } = [];
+ }
+ 
++public class ArticleTag
++{
++    public long ArticleId { get; set; }
++    public int TagId { get; set; }
++}
++
+ public class Favorite
+ {
+     public long UserId { get; set; }
+diff --git a/Program.cs b/Program.cs
+--- a/Program.cs
++++ b/Program.cs
+@@ -10,12 +10,16 @@
+ builder.Logging.SetMinimumLevel(LogLevel.Warning);
+ 
+ builder.Services
+-    .AddConduitDb(settings.DatabaseUrl)
++    .AddConduitDb(settings.DatabaseUrl, builder.Configuration)
+     .AddTokenAuth(settings.JwtSecret)
+     .AddRealWorldErrors()
+     .AddValidation()
+     .AddOpenApi()
+-    .ConfigureHttpJsonOptions(json => json.SerializerOptions.Converters.Add(new UtcMillisConverter()));
++    .ConfigureHttpJsonOptions(json =>
++    {
++        json.SerializerOptions.Converters.Add(new UtcMillisConverter());
++        json.SerializerOptions.TypeInfoResolverChain.Insert(0, ConduitJsonContext.Default);
++    });
+ builder.Services.AddHealthChecks().AddDbContextCheck<ConduitDb>();
+ 
+ var app = builder.Build();
+diff --git a/global.json b/global.json
+new file mode 100644
+--- /dev/null
++++ b/global.json
+@@ -0,0 +1,6 @@
++{
++  "sdk": {
++    "version": "10.0.403",
++    "rollForward": "latestPatch"
++  }
++}

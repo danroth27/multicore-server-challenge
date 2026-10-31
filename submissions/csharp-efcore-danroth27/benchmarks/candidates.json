@@ -1,0 +1,317 @@
+[
+  {
+    "name": "aggregate",
+    "sdk": "10.0.403",
+    "sha256": "118408DDF8A4421F652E257A5DB2FEBB0DCF13CE820879BA5B8A4732D1504694",
+    "environment": {},
+    "properties": {},
+    "description": "LINQ plus provider ArrayAgg tag projection: one SQL row and one favorites count per article",
+    "created_utc": "2026-10-30T21:31:14.9599820+00:00",
+    "source_patch": "variants/aggregate.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "baseline",
+    "sdk": "10.0.403",
+    "sha256": "4CE81E1763552313626294C447401F695FF1053D48BC77E5EDE3DA127C26A68E",
+    "environment": {},
+    "properties": {},
+    "description": "Unmodified PR20, rebuilt with the same SDK as all candidates",
+    "created_utc": "2026-10-30T21:17:50.1048435+00:00",
+    "source_patch": null,
+    "database_role": "postgres"
+  },
+  {
+    "name": "baseline-final",
+    "sdk": "10.0.403",
+    "sha256": "4CE81E1763552313626294C447401F695FF1053D48BC77E5EDE3DA127C26A68E",
+    "environment": {},
+    "properties": {},
+    "description": "Original code with ordinary conduit role for final matched comparisons",
+    "created_utc": "2026-10-30T22:54:21.8856940+00:00",
+    "source_patch": null,
+    "database_role": "conduit"
+  },
+  {
+    "name": "clean-held",
+    "sdk": "10.0.403",
+    "sha256": "82C7D4DC686CD9E82FECB26752D356A09019F67BF161386AA0CEBD291EB904C6",
+    "environment": {},
+    "properties": {},
+    "description": "Cleaned upsert candidate, default pool32, ordinary conduit role, scoped page/count connection",
+    "created_utc": "2026-10-30T22:52:10.5720740+00:00",
+    "source_patch": "variants/clean-held.patch",
+    "database_role": "conduit"
+  },
+  {
+    "name": "comments",
+    "sdk": "10.0.403",
+    "sha256": "ACC104CF16EC9B90FFC6D132498B6167D82C52E7447B66399E20ECF9A5128D82",
+    "environment": {},
+    "properties": {},
+    "description": "Aggregate candidate plus one LINQ query for article existence and comments",
+    "created_utc": "2026-10-30T21:31:36.9392043+00:00",
+    "source_patch": "variants/comments.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "compiled",
+    "sdk": "10.0.403",
+    "sha256": "E110B4ACF0500AFB962D92C8A8748F1BBE5B73A8B572EB255FA6311C6F821A1D",
+    "environment": {},
+    "properties": {},
+    "description": "EF compiled LINQ queries with shared static projection and bounded feed",
+    "created_utc": "2026-10-30T21:42:44.6885364+00:00",
+    "source_patch": "variants/compiled.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "favorite2",
+    "sdk": "10.0.403",
+    "sha256": "27F2807D720EA327A10110E9B49018C5910467F11F58FB37F9F4842B1CC87901",
+    "environment": {},
+    "properties": {},
+    "description": "Held pool32 finalist with favorite mutation reduced to two commands",
+    "created_utc": "2026-10-30T23:48:53.5005505+00:00",
+    "source_patch": "variants/favorite2.patch",
+    "database_role": "conduit"
+  },
+  {
+    "name": "gc2",
+    "sdk": "10.0.403",
+    "sha256": "F3B661A3F0ACBC051135999301E00EF5B620E1603AB984C2F9DEB3FC3D91BDF3",
+    "environment": {
+      "DB_POOL_SIZE": "32",
+      "DOTNET_GCHeapCount": "2"
+    },
+    "properties": {},
+    "description": "Upsert32 with server GC maximum heap count 2",
+    "created_utc": "2026-10-30T22:30:15.7970733+00:00",
+    "source_patch": "variants/gc2.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "held32",
+    "sdk": "10.0.403",
+    "sha256": "7A27832A5CF46599E1860955ABAC67BBBC2DC5FB29E912145F545F92D56A9CB9",
+    "environment": {
+      "DB_POOL_SIZE": "32"
+    },
+    "properties": {},
+    "description": "JSON candidate, pool32, keep one standard EF connection open across page and count",
+    "created_utc": "2026-10-30T22:28:29.9306905+00:00",
+    "source_patch": "variants/held32.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "jitoff32",
+    "sdk": "10.0.403",
+    "sha256": "F3B661A3F0ACBC051135999301E00EF5B620E1603AB984C2F9DEB3FC3D91BDF3",
+    "environment": {
+      "DB_POOL_SIZE": "32",
+      "DB_OPTIONS": "-c jit=off"
+    },
+    "properties": {},
+    "description": "Upsert32 with PostgreSQL session JIT disabled, automatic plan choice retained",
+    "created_utc": "2026-10-30T22:30:15.8173776+00:00",
+    "source_patch": "variants/jitoff32.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "join",
+    "sdk": "10.0.403",
+    "sha256": "BF7F82BD0AC149CE8ECB8D76AA734F9CEA7178911B6454302CAB97E02213E106",
+    "environment": {},
+    "properties": {},
+    "description": "Source-generated JSON candidate with standard joined tag collection instead of scalar array aggregation",
+    "created_utc": "2026-10-30T22:02:57.9643313+00:00",
+    "source_patch": "variants/join.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "join16",
+    "sdk": "10.0.403",
+    "sha256": "BF7F82BD0AC149CE8ECB8D76AA734F9CEA7178911B6454302CAB97E02213E106",
+    "environment": {
+      "DB_POOL_SIZE": "16"
+    },
+    "properties": {},
+    "description": "Joined tag projection with pool16",
+    "created_utc": "2026-10-30T22:03:36.4630450+00:00",
+    "source_patch": "variants/join16.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "json",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {},
+    "properties": {},
+    "description": "UTF-8 timestamps plus standard System.Text.Json source-generated metadata",
+    "created_utc": "2026-10-30T21:46:30.8611729+00:00",
+    "source_patch": "variants/json.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "linq",
+    "sdk": "10.0.403",
+    "sha256": "380CFB39F8DC8709805F486CABD757884751A0D9A85FF1D2A32ECD853BABD61B",
+    "environment": {},
+    "properties": {},
+    "description": "LINQ-only bounded LATERAL feed, page IDs before enrichment, direct junction-table counts",
+    "created_utc": "2026-10-30T21:30:43.3000865+00:00",
+    "source_patch": "variants/linq.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "oldest",
+    "sdk": "10.0.403",
+    "sha256": "2FFF5FAAB386937CED6A7D7EDCA48DD178497EFF4CA689BE3175BB6A4CB3984D",
+    "environment": {},
+    "properties": {},
+    "description": "Comments candidate plus oldest-end ordered global capped count for index-only access",
+    "created_utc": "2026-10-30T21:32:12.2102915+00:00",
+    "source_patch": "variants/oldest.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "pool16",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {
+      "DB_POOL_SIZE": "16"
+    },
+    "properties": {},
+    "description": "JSON candidate with Npgsql maximum pool 16",
+    "created_utc": "2026-10-30T22:03:36.3995614+00:00",
+    "source_patch": "variants/pool16.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "pool32",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {
+      "DB_POOL_SIZE": "32"
+    },
+    "properties": {},
+    "description": "JSON candidate with Npgsql maximum pool 32",
+    "created_utc": "2026-10-30T22:03:36.4207729+00:00",
+    "source_patch": "variants/pool32.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "pool64",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {
+      "DB_POOL_SIZE": "64"
+    },
+    "properties": {},
+    "description": "JSON candidate with Npgsql maximum pool 64",
+    "created_utc": "2026-10-30T22:03:36.4420020+00:00",
+    "source_patch": "variants/pool64.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "pool8",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {
+      "DB_POOL_SIZE": "8"
+    },
+    "properties": {},
+    "description": "JSON candidate with Npgsql maximum pool 8",
+    "created_utc": "2026-10-30T22:03:36.3758680+00:00",
+    "source_patch": "variants/pool8.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "prepared",
+    "sdk": "10.0.403",
+    "sha256": "97DC3D5CE4DA32D13D2BBB514979805EAEAC5669BDD38FC23D5AB45C26C15758",
+    "environment": {},
+    "properties": {},
+    "description": "Preparation only, max64/min2; original LINQ and pool90",
+    "created_utc": "2026-10-30T21:24:23.6753420+00:00",
+    "source_patch": "variants/prepared.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "release16",
+    "sdk": "10.0.403",
+    "sha256": "8BEE314382D611DF167BE4278A668AFDC289279E7CADE4DB7F65418198B51FEB",
+    "environment": {
+      "DB_POOL_SIZE": "16"
+    },
+    "properties": {},
+    "description": "Release candidate with pool16",
+    "created_utc": "2026-10-30T22:54:21.8524432+00:00",
+    "source_patch": "variants/release16.patch",
+    "database_role": "conduit"
+  },
+  {
+    "name": "release32",
+    "sdk": "10.0.403",
+    "sha256": "8BEE314382D611DF167BE4278A668AFDC289279E7CADE4DB7F65418198B51FEB",
+    "environment": {},
+    "properties": {},
+    "description": "Ordinary EF connection lifetime, default pool32, compiled LINQ and three targeted upserts",
+    "created_utc": "2026-10-30T22:54:21.8108737+00:00",
+    "source_patch": "variants/release32.patch",
+    "database_role": "conduit"
+  },
+  {
+    "name": "session16",
+    "sdk": "10.0.403",
+    "sha256": "BCFE4B041BAF94CB63519C3E2E23DA05496247DA3B4A157AAFD63F173CDBC3C4",
+    "environment": {
+      "DB_POOL_SIZE": "16",
+      "DB_OPTIONS": "-c jit=off -c max_parallel_workers_per_gather=0 -c plan_cache_mode=force_generic_plan"
+    },
+    "properties": {},
+    "description": "Pool16 with session-only generic plans, JIT and parallelism disabled",
+    "created_utc": "2026-10-30T22:03:36.4841848+00:00",
+    "source_patch": "variants/session16.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "upsert32",
+    "sdk": "10.0.403",
+    "sha256": "F3B661A3F0ACBC051135999301E00EF5B620E1603AB984C2F9DEB3FC3D91BDF3",
+    "environment": {
+      "DB_POOL_SIZE": "32"
+    },
+    "properties": {},
+    "description": "Scoped page/count connection plus three targeted parameterized EF Core idempotent upserts",
+    "created_utc": "2026-10-30T22:30:13.0101032+00:00",
+    "source_patch": "variants/upsert32.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "utf8",
+    "sdk": "10.0.403",
+    "sha256": "ED0BEEE097B5D7BE71346D528E60AF4E3F6DAEA390FE0B2349C8724C77A71B8C",
+    "environment": {},
+    "properties": {},
+    "description": "Compiled queries plus allocation-free standard DateTime UTF-8 formatting",
+    "created_utc": "2026-10-30T21:46:20.8527286+00:00",
+    "source_patch": "variants/utf8.patch",
+    "database_role": "postgres"
+  },
+  {
+    "name": "workstation32",
+    "sdk": "10.0.403",
+    "sha256": "F3B661A3F0ACBC051135999301E00EF5B620E1603AB984C2F9DEB3FC3D91BDF3",
+    "environment": {
+      "DB_POOL_SIZE": "32"
+    },
+    "properties": {
+      "ServerGarbageCollection": "false"
+    },
+    "description": "Upsert32 with workstation instead of server GC",
+    "created_utc": "2026-10-30T22:30:15.7558349+00:00",
+    "source_patch": "variants/workstation32.patch",
+    "database_role": "postgres"
+  }
+]

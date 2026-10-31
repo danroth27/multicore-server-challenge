@@ -1,0 +1,12 @@
+
+Provider Name                           Keywords            Level               Enabled By
+Microsoft-DotNETCore-SampleProfiler     0x0000F00000000000  Informational(4)    --profile
+
+Process        : /usr/share/dotnet/dotnet
+Output File    : /study/profiles/20261030T214309-compiled-profile.nettrace
+Trace Duration : 00:00:00:35
+
+Stopping the trace. This may take several minutes depending on the application being traced.
+
+Trace completed.
+Processing trace data file '/study/profiles/20261030T214309-compiled-profile.nettrace' to create a new Speedscope file '/study/profiles/20261030T214309-compiled-profile.speedscope.json'.

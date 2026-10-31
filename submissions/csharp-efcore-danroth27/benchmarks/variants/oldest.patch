@@ -1,0 +1,239 @@
+diff --git a/Api/ArticlesApi.cs b/Api/ArticlesApi.cs
+--- a/Api/ArticlesApi.cs
++++ b/Api/ArticlesApi.cs
+@@ -24,10 +24,34 @@
+ 
+     static Task<Ok<ArticlesResponse>> List(
+         [AsParameters] ArticleFilter filter, Page page, Viewer viewer, ConduitDb db, CancellationToken ct) =>
+-        Paged(filter.Apply(db), page, viewer, ct);
++        Paged(filter.ApplyIds(db), page, viewer, db, ct);
+ 
+-    static Task<Ok<ArticlesResponse>> Feed(Page page, Viewer viewer, ConduitDb db, CancellationToken ct) =>
+-        Paged(db.Follows.Where(f => f.FollowerId == viewer.Id).SelectMany(f => f.Followee.Articles), page, viewer, ct);
++    static async Task<Ok<ArticlesResponse>> Feed(Page page, Viewer viewer, ConduitDb db, CancellationToken ct)
++    {
++        var follows = db.Follows.Where(f => f.FollowerId == viewer.Id);
++        var allIds = follows.SelectMany(f => db.Articles.Where(a => a.AuthorId == f.FolloweeId)).Select(a => a.Id);
++        if (page.Offset > int.MaxValue - page.Limit)
++            return await Paged(allIds, page, viewer, db, ct);
++
++        var budget = page.Limit + page.Offset;
++        var candidates = follows.SelectMany(f => db.Articles.Where(a => a.AuthorId == f.FolloweeId)
++            .OrderByDescending(a => a.Id).Take(budget)
++            .Select(a => new { a.Id, f.FollowerId }))
++            .OrderByDescending(a => a.Id).Skip(page.Offset).Take(page.Limit);
++        var articles = await candidates.Join(db.Articles, p => p.Id, a => a.Id, (p, a) => new { p.FollowerId, Article = a })
++            .OrderByDescending(x => x.Article.Id)
++            .Select(x => new ArticleView(
++                x.Article.Slug, x.Article.Title, x.Article.Description, null,
++                x.Article.Tags.GroupBy(t => 1)
++                    .Select(g => EF.Functions.ArrayAgg(g.OrderBy(t => t.Name).Select(t => t.Name)))
++                    .FirstOrDefault() ?? Array.Empty<string>(),
++                x.Article.CreatedAt, x.Article.UpdatedAt,
++                x.Article.Favorites.Any(f => f.UserId == x.FollowerId), x.Article.Favorites.Count,
++                new ProfileView(x.Article.Author.Username, x.Article.Author.Bio, x.Article.Author.Image, true)))
++            .ToListAsync(ct);
++        var count = await allIds.Take(MaxCount).CountAsync(ct);
++        return TypedResults.Ok(new ArticlesResponse(articles, count));
++    }
+ 
+     static async Task<Results<Ok<ArticleResponse>, ProblemHttpResult>> Get(
+         string slug, Viewer viewer, ConduitDb db, CancellationToken ct)
+@@ -106,15 +130,15 @@
+     }
+ 
+     /// <summary>One page, newest first, and the total capped at 1,000.</summary>
+-    static async Task<Ok<ArticlesResponse>> Paged(IQueryable<Article> articles, Page page, Viewer viewer, CancellationToken ct)
++    static async Task<Ok<ArticlesResponse>> Paged(
++        IQueryable<long> ids, Page page, Viewer viewer, ConduitDb db, CancellationToken ct)
+     {
+-        var list = await articles
++        var pageIds = ids.OrderByDescending(id => id).Skip(page.Offset).Take(page.Limit);
++        var list = await db.Articles.Where(a => pageIds.Contains(a.Id))
+             .OrderByDescending(a => a.Id)
+-            .Skip(page.Offset)
+-            .Take(page.Limit)
+             .Select(Projections.Article(viewer.Id, includeBody: false))
+             .ToListAsync(ct);
+-        var count = await articles.Take(MaxCount).CountAsync(ct);
++        var count = await ids.Take(MaxCount).CountAsync(ct);
+ 
+         return TypedResults.Ok(new ArticlesResponse(list, count));
+     }
+diff --git a/Api/CommentsApi.cs b/Api/CommentsApi.cs
+--- a/Api/CommentsApi.cs
++++ b/Api/CommentsApi.cs
+@@ -20,17 +20,16 @@
+     static async Task<Results<Ok<CommentsResponse>, ProblemHttpResult>> List(
+         string slug, Viewer viewer, ConduitDb db, CancellationToken ct)
+     {
+-        var articleId = await db.ArticleIdAsync(slug, ct);
+-        if (articleId is null) return Errors.NotFound;
+-
+-        var comments = await db.Comments
+-            .Where(c => c.ArticleId == articleId)
+-            .OrderByDescending(c => c.CreatedAt).ThenByDescending(c => c.Id)
+-            .Take(MaxComments)
+-            .Select(Projections.Comment(viewer.Id))
+-            .ToListAsync(ct);
+-
+-        return TypedResults.Ok(new CommentsResponse(comments));
++        var response = await db.Articles.Where(a => a.Slug == slug)
++            .Select(a => new CommentsResponse(db.Comments.Where(c => c.ArticleId == a.Id)
++                .OrderByDescending(c => c.CreatedAt).ThenByDescending(c => c.Id)
++                .Take(MaxComments)
++                .Select(c => new CommentView(c.Id, c.CreatedAt, c.UpdatedAt, c.Body,
++                    new ProfileView(c.Author.Username, c.Author.Bio, c.Author.Image,
++                        c.Author.Followers.Any(f => f.FollowerId == viewer.Id))))
++                .ToList()))
++            .SingleOrDefaultAsync(ct);
++        return response is null ? Errors.NotFound : TypedResults.Ok(response);
+     }
+ 
+     static async Task<Results<Created<CommentResponse>, ProblemHttpResult>> Create(
+diff --git a/Api/Requests.cs b/Api/Requests.cs
+--- a/Api/Requests.cs
++++ b/Api/Requests.cs
+@@ -58,12 +58,19 @@
+ /// <summary>GET /api/articles filters. Only the first one given applies, in this order.</summary>
+ public record ArticleFilter(string? Tag, string? Author, string? Favorited)
+ {
+-    public IQueryable<Article> Apply(ConduitDb db)
++    public IQueryable<long> ApplyIds(ConduitDb db)
+     {
+-        if (!string.IsNullOrEmpty(Tag)) return db.Tags.Where(t => t.Name == Tag).SelectMany(t => t.Articles);
+-        if (!string.IsNullOrEmpty(Author)) return db.Articles.Where(a => a.Author.Username == Author);
+-        if (!string.IsNullOrEmpty(Favorited)) return db.Favorites.Where(f => f.User.Username == Favorited).Select(f => f.Article);
+-        return db.Articles;
++        if (!string.IsNullOrEmpty(Tag))
++            return db.ArticleTags.Where(at => db.Tags.Where(t => t.Name == Tag).Select(t => t.Id).Contains(at.TagId))
++                .Select(at => at.ArticleId);
++        if (!string.IsNullOrEmpty(Author))
++            return db.Articles.Where(a => db.Users.Where(u => u.Username == Author).Select(u => u.Id).Contains(a.AuthorId))
++                .Select(a => a.Id);
++        if (!string.IsNullOrEmpty(Favorited))
++            return db.Favorites.Where(f => db.Users.Where(u => u.Username == Favorited).Select(u => u.Id).Contains(f.UserId))
++                .Select(f => f.ArticleId);
++        // Oldest rows are more likely to remain all-visible for the capped count.
++        return db.Articles.OrderBy(a => a.Id).Select(a => a.Id);
+     }
+ }
+ 
+diff --git a/Api/Views.cs b/Api/Views.cs
+--- a/Api/Views.cs
++++ b/Api/Views.cs
+@@ -1,6 +1,7 @@
+ using System.Linq.Expressions;
+ using System.Text.Json.Serialization;
+ using Conduit.Data;
++using Microsoft.EntityFrameworkCore;
+ 
+ namespace Conduit.Api;
+ 
+@@ -19,7 +20,7 @@
+     string Title,
+     string Description,
+     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Body,
+-    List<string> TagList,
++    string[] TagList,
+     DateTime CreatedAt,
+     DateTime UpdatedAt,
+     bool Favorited,
+@@ -45,7 +46,9 @@
+         article.Title,
+         article.Description,
+         includeBody ? article.Body : null,
+-        article.Tags.OrderBy(t => t.Name).Select(t => t.Name).ToList(),
++        article.Tags.GroupBy(t => 1)
++            .Select(g => EF.Functions.ArrayAgg(g.OrderBy(t => t.Name).Select(t => t.Name)))
++            .FirstOrDefault() ?? Array.Empty<string>(),
+         article.CreatedAt,
+         article.UpdatedAt,
+         article.Favorites.Any(f => f.UserId == viewerId),
+diff --git a/Data/ConduitDb.cs b/Data/ConduitDb.cs
+--- a/Data/ConduitDb.cs
++++ b/Data/ConduitDb.cs
+@@ -10,6 +10,7 @@
+     public DbSet<Follow> Follows => Set<Follow>();
+     public DbSet<Article> Articles => Set<Article>();
+     public DbSet<Tag> Tags => Set<Tag>();
++    public DbSet<ArticleTag> ArticleTags => Set<ArticleTag>();
+     public DbSet<Favorite> Favorites => Set<Favorite>();
+     public DbSet<Comment> Comments => Set<Comment>();
+ 
+@@ -24,10 +25,10 @@
+         model.HasSequence<long>("articles_id_seq").IncrementsBy(1);
+         model.Entity<Article>().Property(a => a.Id).UseHiLo("articles_id_seq");
+ 
+-        model.Entity<Article>().HasMany(a => a.Tags).WithMany(t => t.Articles).UsingEntity(
+-            "article_tags",
+-            tag => tag.HasOne(typeof(Tag)).WithMany().HasForeignKey("tag_id"),
+-            article => article.HasOne(typeof(Article)).WithMany().HasForeignKey("article_id"));
++        model.Entity<Article>().HasMany(a => a.Tags).WithMany(t => t.Articles).UsingEntity<ArticleTag>(
++            tag => tag.HasOne<Tag>().WithMany().HasForeignKey(t => t.TagId),
++            article => article.HasOne<Article>().WithMany().HasForeignKey(t => t.ArticleId),
++            link => link.ToTable("article_tags").HasKey(t => new { t.ArticleId, t.TagId }));
+     }
+ 
+     public Task<long?> ArticleIdAsync(string slug, CancellationToken ct) =>
+@@ -93,9 +94,9 @@
+ 
+ public static class ConduitDbSetup
+ {
+-    public static IServiceCollection AddConduitDb(this IServiceCollection services, string databaseUrl) =>
++    public static IServiceCollection AddConduitDb(this IServiceCollection services, string databaseUrl, IConfiguration configuration) =>
+         services.AddDbContextPool<ConduitDb>(db => db
+-            .UseNpgsql(ConnectionString(databaseUrl))
++            .UseNpgsql(ConnectionString(databaseUrl, configuration))
+             .UseSnakeCaseNamingConvention()
+             // A duplicate that SaveIgnoringDuplicatesAsync expects is not an error. Real failures still reach the
+             // exception handler, which logs them.
+@@ -104,7 +105,7 @@
+                 (RelationalEventId.CommandError, LogLevel.Debug))));
+ 
+     /// <summary>Turns postgres://user:password@host:port/database into an Npgsql connection string.</summary>
+-    static string ConnectionString(string databaseUrl)
++    static string ConnectionString(string databaseUrl, IConfiguration configuration)
+     {
+         var url = new Uri(databaseUrl);
+         var credentials = url.UserInfo.Split(':', 2).Select(Uri.UnescapeDataString).ToArray();
+@@ -115,7 +116,10 @@
+             Database = url.AbsolutePath.Trim('/'),
+             Username = credentials[0],
+             Password = credentials.ElementAtOrDefault(1),
+-            MaxPoolSize = 90, // Postgres allows 100 connections; leave a few for psql.
++            MaxPoolSize = configuration.GetValue("DB_POOL_SIZE", 90),
++            MaxAutoPrepare = configuration.GetValue("DB_MAX_AUTO_PREPARE", 64),
++            AutoPrepareMinUsages = configuration.GetValue("DB_AUTO_PREPARE_MIN_USAGES", 2),
++            Options = configuration["DB_OPTIONS"],
+         }.ConnectionString;
+     }
+ }
+diff --git a/Data/Entities.cs b/Data/Entities.cs
+--- a/Data/Entities.cs
++++ b/Data/Entities.cs
+@@ -57,6 +57,12 @@
+     public List<Article> Articles { get; set; } = [];
+ }
+ 
++public class ArticleTag
++{
++    public long ArticleId { get; set; }
++    public int TagId { get; set; }
++}
++
+ public class Favorite
+ {
+     public long UserId { get; set; }
+diff --git a/Program.cs b/Program.cs
+--- a/Program.cs
++++ b/Program.cs
+@@ -10,7 +10,7 @@
+ builder.Logging.SetMinimumLevel(LogLevel.Warning);
+ 
+ builder.Services
+-    .AddConduitDb(settings.DatabaseUrl)
++    .AddConduitDb(settings.DatabaseUrl, builder.Configuration)
+     .AddTokenAuth(settings.JwtSecret)
+     .AddRealWorldErrors()
+     .AddValidation()
