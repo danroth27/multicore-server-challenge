@@ -66,6 +66,17 @@
     "database_role": "postgres"
   },
   {
+    "name": "correctness-id32",
+    "sdk": "10.0.403",
+    "sha256": "EC93DD980E36320DB9A72503382947E50B38133124ED1E539BB65EAB804E1ACE",
+    "environment": {},
+    "properties": {},
+    "description": "Stable-ID favorite/unfavorite and authorized article deletion; reject unsupported database URL settings at startup. Other performance choices unchanged.",
+    "created_utc": "2026-10-31T05:52:15.7767617+00:00",
+    "source_patch": "variants/correctness-id32.patch",
+    "database_role": "conduit"
+  },
+  {
     "name": "favorite2",
     "sdk": "10.0.403",
     "sha256": "27F2807D720EA327A10110E9B49018C5910467F11F58FB37F9F4842B1CC87901",

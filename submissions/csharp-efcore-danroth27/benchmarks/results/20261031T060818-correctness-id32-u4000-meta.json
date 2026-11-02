@@ -1,0 +1,36 @@
+{
+  "variant": "correctness-id32",
+  "users": 4000,
+  "workload": "optimization-control-final-b",
+  "candidate": {
+    "name": "correctness-id32",
+    "sdk": "10.0.403",
+    "sha256": "EC93DD980E36320DB9A72503382947E50B38133124ED1E539BB65EAB804E1ACE",
+    "environment": {},
+    "properties": {},
+    "description": "Stable-ID favorite/unfavorite and authorized article deletion; reject unsupported database URL settings at startup. Other performance choices unchanged.",
+    "created_utc": "2026-10-31T05:52:15.7767617+00:00",
+    "source_patch": "variants/correctness-id32.patch",
+    "database_role": "conduit"
+  },
+  "cpu": {
+    "postgres": {
+      "elapsed_ms": 119458,
+      "core_seconds": 84.789566,
+      "cpu_percent": 11.829759692388397
+    },
+    "app": {
+      "elapsed_ms": 119437,
+      "core_seconds": 123.4488,
+      "cpu_percent": 17.226487604343717
+    },
+    "loadgen": {
+      "elapsed_ms": 119447,
+      "core_seconds": 25.11961,
+      "cpu_percent": 10.514960610145085
+    }
+  },
+  "warmup_seconds": 180,
+  "ramp_seconds": 60,
+  "measure_seconds": 120
+}

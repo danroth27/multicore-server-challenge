@@ -66,6 +66,22 @@ Environment overrides are a complete replacement, not inherited from the reused 
 
 `Verify-Edges.ps1` runs focused API assertions against an already running candidate. Use only a disposable trial database: it creates users and articles, exercises concurrent writes, and cleans up its articles but cannot delete users through this API.
 
+### Deterministic correctness regressions
+
+`RegressionChecks` is a small console project referencing the application and its existing Npgsql dependency; it adds no test framework or production instrumentation. It checks rejection of unsupported database URL settings, then forces the three reviewed rename interleavings using uncommitted row updates and `pg_blocking_pids`. Run it outside timed measurements, against the disposable trial database and an already running application, with direct database access as the same `conduit` role:
+
+```powershell
+Push-Location (Split-Path $Bench -Parent) # selects the submission's pinned SDK
+try {
+    dotnet run --project .\benchmarks\RegressionChecks\RegressionChecks.csproj -c Release -- `
+        http://127.0.0.1:53110 'Host=127.0.0.1;Port=55432;Database=conduit_review_run;Username=conduit;Password=your-local-fixture-password'
+    if ($LASTEXITCODE -ne 0) { throw 'Correctness regression failed' }
+}
+finally { Pop-Location }
+```
+
+The database endpoint/password are fixture-specific examples, not production credentials. An optional final argument (`favorite`, `unfavorite`, or `delete`) runs one rename case. The preserved superseded `favorite2` binary failed each case independently; the fixed `correctness-id32` binary passed all three. These checks create users, clean up their articles by ID, and leave the seed template untouched.
+
 ## Evidence
 
 The report explains the experiment names, matched comparisons, profiling caveats, and limitations. Retained measurements include merged load-generator JSON and compact run metadata, rather than request transcripts containing authentication tokens. Variant patches record source changes from the original implementation; configuration-only variants share the recorded assembly hash. The final patch was replayed against the original snapshot.
@@ -74,8 +90,8 @@ The report explains the experiment names, matched comparisons, profiling caveats
 |---|---|
 | `environment.json` | Image digests, PostgreSQL settings, CPU affinity, memory limits, and toolchain |
 | `candidates.json`, `variants` | Candidate settings, hashes, descriptions, and source patches |
-| `results-summary.json`, `results` | All 38 trials, merged endpoint distributions, and CPU/timing metadata |
-| `conformance.json`, `focused-tests.txt` | Official conformance summaries and final focused-assertion result |
+| `results-summary.json`, `results` | All 51 trials, including failed correctness-revision attempts, merged endpoint distributions, and CPU/timing metadata |
+| `conformance.json`, `focused-tests.txt`, `correctness-regressions.txt`, `correctness-validation.json` | Official conformance summaries, corrected focused-assertion result, deterministic regression result, and negative-control outcomes with binary hashes |
 | `plans` | Actual SQL and JSON query plans for custom/generic planning probes |
 | `profiles` | Counter/activity samples, summaries, thread-time stack reports, collector warnings, and the denied on-CPU probe |
 

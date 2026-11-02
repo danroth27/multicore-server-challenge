@@ -8,7 +8,9 @@ The improvements are mostly ordinary data-access work: bounded feed selection ex
 
 See the [optimization report](OPTIMIZATION-REPORT.md) for experiments, local results, rejected alternatives, and remaining bottlenecks. These are local Docker measurements, not an official leaderboard score.
 
-At matched 4,000-user load, PostgreSQL CPU/request fell about 77% and combined application/database CPU/request about 58%. The final implementation passed two five-minute 20,000-user holds at about 5,285 requests/s, p99 146-274 ms, and zero errors.
+Independent review found rename races in the two-command favorite optimization and inherited article deletion. The current implementation resolves stable article IDs for favorite, unfavorite, and authorized deletion; it deliberately restores the extra favorite lookup. The report identifies the superseded measurements separately from the corrected candidate.
+
+Across three completed, SLA-passing 4,000-user pairs, including reverse order, the corrected implementation uses approximately 76% less PostgreSQL CPU/request and 58% less combined app/database CPU/request. Two recovery five-minute 20,000-user holds pass at about 5,283 requests/s, p99 230-400 ms, and zero errors. Earlier failed trials are also retained: shared-host variability remains unresolved, so these are not guaranteed sustained-capacity numbers.
 
 ## Run
 
@@ -24,6 +26,8 @@ dotnet .\bin\conduit.dll
 ```
 
 The database URL and JWT secret above are examples, not production credentials.
+
+`DATABASE_URL` accepts `postgres` or `postgresql` URIs without query parameters or fragments. Unsupported parameters, including TLS options, fail at startup rather than being silently ignored. This benchmark adapter is not a general-purpose production connection configuration. Username/title length behavior remains as prescribed by the benchmark; production use needs explicit route-backed identifier limits.
 
 | Setting | Default | Purpose |
 |---|---:|---|

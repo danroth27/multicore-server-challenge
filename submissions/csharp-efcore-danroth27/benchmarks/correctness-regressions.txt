@@ -1,0 +1,8 @@
+PASS: unsupported database URL rejected at registration.
+PASS: unsupported database URL rejected at registration.
+PASS: unsupported database URL rejected at registration.
+PASS: unsupported database URL rejected at registration.
+PASS: deterministic favorite concurrent-rename regression.
+PASS: deterministic unfavorite concurrent-rename regression.
+PASS: deterministic delete concurrent-rename regression.
+4 database URL checks and 3 deterministic rename regressions passed.

@@ -56,12 +56,12 @@ public class ConduitDb(DbContextOptions<ConduitDb> options) : DbContext(options)
     public Task UnfollowAsync(long followerId, long followeeId, CancellationToken ct) =>
         Follows.Where(f => f.FollowerId == followerId && f.FolloweeId == followeeId).ExecuteDeleteAsync(ct);
 
-    public Task FavoriteAsync(long userId, string slug, CancellationToken ct) =>
+    public Task FavoriteAsync(long userId, long articleId, CancellationToken ct) =>
         Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO favorites (user_id, article_id) SELECT {userId}, id FROM articles WHERE slug = {slug} ON CONFLICT (user_id, article_id) DO NOTHING", ct);
+            $"INSERT INTO favorites (user_id, article_id) VALUES ({userId}, {articleId}) ON CONFLICT (user_id, article_id) DO NOTHING", ct);
 
-    public Task UnfavoriteAsync(long userId, string slug, CancellationToken ct) =>
-        Favorites.Where(f => f.UserId == userId && f.Article.Slug == slug).ExecuteDeleteAsync(ct);
+    public Task UnfavoriteAsync(long userId, long articleId, CancellationToken ct) =>
+        Favorites.Where(f => f.UserId == userId && f.ArticleId == articleId).ExecuteDeleteAsync(ct);
 
 }
 
@@ -73,19 +73,28 @@ public static class DbUpdateExceptionExtensions
 
 public static class ConduitDbSetup
 {
-    public static IServiceCollection AddConduitDb(this IServiceCollection services, string databaseUrl, IConfiguration configuration) =>
-        services.AddDbContextPool<ConduitDb>(db => db
-            .UseNpgsql(ConnectionString(databaseUrl, configuration))
+    public static IServiceCollection AddConduitDb(this IServiceCollection services, string databaseUrl, IConfiguration configuration)
+    {
+        var connectionString = ConnectionString(databaseUrl, configuration);
+        return services.AddDbContextPool<ConduitDb>(db => db
+            .UseNpgsql(connectionString)
             .UseSnakeCaseNamingConvention()
             // The exception handler logs unexpected failures and translates duplicate usernames/emails to 422.
             .ConfigureWarnings(log => log.Log(
                 (CoreEventId.SaveChangesFailed, LogLevel.Debug),
                 (RelationalEventId.CommandError, LogLevel.Debug))));
+    }
 
     /// <summary>Turns postgres://user:password@host:port/database into an Npgsql connection string.</summary>
     static string ConnectionString(string databaseUrl, IConfiguration configuration)
     {
         var url = new Uri(databaseUrl);
+        if (url.Scheme is not ("postgres" or "postgresql"))
+            throw new ArgumentException("DATABASE_URL must use the postgres or postgresql scheme.", nameof(databaseUrl));
+        if (url.Query.Length != 0 || url.Fragment.Length != 0)
+            throw new ArgumentException(
+                "DATABASE_URL query parameters and fragments are unsupported; refusing to ignore connection or security settings.",
+                nameof(databaseUrl));
         var credentials = url.UserInfo.Split(':', 2).Select(Uri.UnescapeDataString).ToArray();
         return new NpgsqlConnectionStringBuilder
         {

@@ -70,5 +70,9 @@
   {
     "run": "20261030T234913-favorite2-conformance",
     "summary": "197 steps, 197 passed, 0 failed (4.0s)\nRESULT: PASS"
+  },
+  {
+    "run": "20261031T055443-correctness-id32-conformance",
+    "summary": "197 steps, 197 passed, 0 failed (8.0s)\nRESULT: PASS"
   }
 ]

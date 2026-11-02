@@ -1,0 +1,31 @@
+{
+  "corrected_assembly_sha256": "EC93DD980E36320DB9A72503382947E50B38133124ED1E539BB65EAB804E1ACE",
+  "negative_assembly_sha256": "27F2807D720EA327A10110E9B49018C5910467F11F58FB37F9F4842B1CC87901",
+  "method": "Uncommitted row updates plus observed pg_blocking_pids barrier; no production instrumentation",
+  "cases": [
+    {
+      "operation": "favorite",
+      "negative_candidate": "favorite2",
+      "negative_outcome": "404 response after a successful mutation instead of 200",
+      "corrected_candidate": "correctness-id32",
+      "corrected_outcome": "passed"
+    },
+    {
+      "operation": "unfavorite",
+      "negative_candidate": "favorite2",
+      "negative_outcome": "404 response after a successful mutation instead of 200",
+      "corrected_candidate": "correctness-id32",
+      "corrected_outcome": "passed"
+    },
+    {
+      "operation": "delete",
+      "negative_candidate": "favorite2",
+      "negative_outcome": "204 response left concurrently renamed article present",
+      "corrected_candidate": "correctness-id32",
+      "corrected_outcome": "passed"
+    }
+  ],
+  "database_url_checks": 4,
+  "focused_api_assertions": 40,
+  "identifier_policy": "Preserve benchmark contract; document production identifier limits"
+}

@@ -8,7 +8,9 @@ The original implementation was not generally misconfigured: EF context pooling 
 
 The measurements below are local diagnostics, not an official capacity result. Single screening trials identify promising directions but do not establish the independent causal effect of every small change. Final matched comparisons and alternating sustained holds provide the stronger evidence.
 
-**Final result:** at matched 4,000-user load, PostgreSQL CPU/request falls about 77% and combined application/database CPU/request about 58%. Overall p99 falls from 42-44 ms to 4.7-6.5 ms. The final candidate also passes two five-minute 20,000-user holds at approximately 5,285 requests/s, with p99 146-274 ms and zero errors.
+**Correctness revision:** independent review found that the two-command favorite optimization could successfully mutate an article and then return 404 if its slug changed before the response read. Article deletion also inherited a separate slug-rename race. The current candidate, `correctness-id32`, resolves a stable article ID once for these operations. The historical `favorite2` measurements below are retained as evidence, not results for the corrected implementation.
+
+**Updated result:** across three completed, SLA-passing 4,000-user pairs, including a reversed-order pair, the corrected candidate uses approximately 76% less PostgreSQL CPU/request and 58% less combined application/database CPU/request. Its paired p99 is 6.9-11.1 ms versus 39.7-386 ms for the baseline. Two recovery five-minute 20,000-user holds pass at approximately 5,283 requests/s, p99 230-400 ms, and zero errors. Earlier failed trials are retained and described below; this is not evidence that the local host delivers those tails reliably under other concurrent activity.
 
 ## Environment and method
 
@@ -43,13 +45,13 @@ Application and PostgreSQL CPU percentages each use the six target vCPUs as thei
 
 **Scoped connection reuse.** List and feed handlers hold one ordinary EF connection across their page and count commands, closing it in `finally` before the pooled context returns. This avoids an additional checkout/reset between those commands without introducing a read transaction, custom connection pool, or scheduler. Sustained results favored its stability over ordinary per-command connection lifetimes.
 
-**Fewer idempotent-write round trips.** Parameterized `ExecuteSqlInterpolatedAsync` statements implement `INSERT ... ON CONFLICT DO NOTHING` for follows and favorites, and bulk insertion of missing tags using `unnest`. Favorite insertion resolves the article slug in `INSERT ... SELECT`; unfavorite uses a LINQ `ExecuteDeleteAsync` predicate on the article slug. A normal compiled article projection then supplies the response or 404, reducing these mutations from three commands to two while preserving idempotency. Missing tag names are sorted consistently to avoid opposite insertion lock orders in concurrent requests. Ordinary EF tracking, transactions, `SaveChangesAsync`, and `ExecuteDeleteAsync` remain responsible for other writes. Writes commit before responses.
+**Idempotent writes with stable resource identity.** Parameterized `ExecuteSqlInterpolatedAsync` statements implement `INSERT ... ON CONFLICT DO NOTHING` for follows and favorites, and bulk insertion of missing tags using `unnest`. Favorite and unfavorite resolve the article ID by slug, mutate by that ID, and use the same ID for the compiled response projection. This deliberately restores a third command: eliminating it was not worth the rename race. Article deletion resolves ID and author together, checks ownership, and deletes by ID and owner rather than looking up the mutable slug again. Missing tag names are sorted consistently to avoid opposite insertion lock orders in concurrent requests. Ordinary EF tracking, transactions, `SaveChangesAsync`, and `ExecuteDeleteAsync` remain responsible for other writes. Writes commit before responses.
 
 The official generator's article writes select existing seed tags (`bench/cmd/loadgen/vu.go`, `newArticle`). Consequently, batch lookup of existing tags matters to that path, but missing-tag bulk insertion is a correctness/concurrency improvement, not an independently measured steady-state throughput win.
 
 ## Screening experiments
 
-The complete study retains 38 timed trials across 26 candidate configurations. Each row below is one short trial, generally a directional screen rather than a replicated estimate. Variants are incremental within a phase; names correspond to the persisted evidence. Errors were zero in these trials.
+The complete evidence now contains 51 timed trials across 27 candidate configurations: the original 38 trials/26 configurations plus 13 correctness-revision and recovery trials. An interrupted recovery attempt produced no completed measurement and is not counted. Each row below is one original short trial, generally a directional screen rather than a replicated estimate. Variants are incremental within a phase; names correspond to the persisted evidence. Errors were zero in these original screening trials.
 
 | Variant | Users | Requests/s | p95 ms | p99 ms | PG CPU % | App CPU % |
 |---|---:|---:|---:|---:|---:|---:|
@@ -85,9 +87,9 @@ The ordered and unordered global capped counts produced the same index-only plan
 
 Workstation GC regressed decisively. Neither limiting server GC heaps nor disabling PostgreSQL JIT alone established a reliable advantage, so their defaults remain unchanged. The forced-generic-plan combination was rejected both by workload results and by the actual query plans below.
 
-## Sustained finalist selection
+## Historical sustained finalist selection
 
-These are five-minute measurements at 20,000 users, after a three-minute 500-user warm-up and a one-minute ramp. The first two candidates ran in alternating order across workload seeds A and B. The final two-command-favorite candidate then repeated both seeds. All six runs had zero errors and a clean load-generator flag.
+These are the original five-minute measurements at 20,000 users, after a three-minute 500-user warm-up and a one-minute ramp. The first two candidates ran in alternating order across workload seeds A and B. The subsequently superseded two-command-favorite candidate then repeated both seeds. All six runs had zero errors and a clean load-generator flag; the benchmark workload did not expose its rename race.
 
 | Candidate | Seed/order | Requests/s | p95 ms | p99 ms | PG CPU % | App CPU % | SLA |
 |---|---|---:|---:|---:|---:|---:|---|
@@ -95,27 +97,72 @@ These are five-minute measurements at 20,000 users, after a three-minute 500-use
 | Ordinary EF connection lifetime | A, second | 4,959.9 | 1,233.92 | 2,803.71 | 48.08 | 38.31 | Fail |
 | Ordinary EF connection lifetime | B, first | 5,290.3 | 33.31 | 109.57 | 46.94 | 36.12 | Pass |
 | Held connection, three-command favorite | B, second | 5,277.7 | 45.28 | 494.59 | 45.54 | 36.52 | Pass |
-| **Final: held connection, two-command favorite** | **A** | **5,292.2** | **31.57** | **145.54** | **44.90** | **35.83** | **Pass** |
-| **Final: held connection, two-command favorite** | **B** | **5,277.8** | **89.79** | **273.66** | **45.66** | **36.05** | **Pass** |
+| Superseded `favorite2`: held connection, two-command favorite | A | 5,292.2 | 31.57 | 145.54 | 44.90 | 35.83 | Pass |
+| Superseded `favorite2`: held connection, two-command favorite | B | 5,277.8 | 89.79 | 273.66 | 45.66 | 36.05 | Pass |
 
-The final candidate is retained: it passes both sustained trials, removes an unnecessary database command, and shows no observed CPU-efficiency regression. Its slightly lower CPU and better p99 values do not establish an independently repeatable percentage benefit for that one command change. Ordinary connection lifetimes were substantially less stable in this sample, despite producing the single lowest p99 in one trial. Neither a single best tail nor a single short screen is a sound selection criterion.
+The two-command candidate was originally selected because it passed both sustained trials without an observed CPU-efficiency regression. Independent review and deterministic regression tests subsequently disproved its rename correctness, so it is no longer retained. Its slightly lower CPU and better p99 values never established an independently repeatable percentage benefit for that one command change. Ordinary connection lifetimes were substantially less stable in this sample, despite producing the single lowest p99 in one trial. Neither a single best tail, a single short screen, nor a benchmark pass alone is a sound selection criterion.
 
-The final unprofiled holds consume approximately 2.7 PostgreSQL cores and 2.2 application cores at 5,285 requests/s. Database work remains slightly larger, but this is no longer an application waiting mostly idle while PostgreSQL dominates the machine. Application processing, database processing, allocation/GC, and durable-write latency all matter near this load.
+Those historical unprofiled `favorite2` holds consumed approximately 2.7 PostgreSQL cores and 2.2 application cores at 5,285 requests/s. Database work remained slightly larger, but the application was no longer waiting mostly idle while PostgreSQL dominated the machine. Application processing, database processing, allocation/GC, and durable-write latency all matter near this load.
 
-## Final matched baseline comparison
+## Historical matched baseline comparison
 
-These controls use the ordinary `conduit` role on both sides, the same pinned runtime/SDK, a fresh full seed per trial, three-minute warm-ups, one-minute ramps, and two-minute measurements at 4,000 users. Candidate order is reversed for seed B. All four runs have zero errors, pass the SLA, and have a clean generator flag.
+These original controls compare the baseline with the superseded `favorite2` binary, using the ordinary `conduit` role on both sides, the same pinned runtime/SDK, a fresh full seed per trial, three-minute warm-ups, one-minute ramps, and two-minute measurements at 4,000 users. Candidate order is reversed for seed B. All four runs have zero errors, pass the SLA, and have a clean generator flag.
 
 | Candidate | Seed/order | Requests/s | p95 ms | p99 ms | PG CPU % | App CPU % | PG CPU-ms/request | App CPU-ms/request |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | Original | A, first | 1,056.1 | 18.72 | 44.45 | 39.10 | 18.43 | 2.221 | 1.047 |
-| Final | A, second | 1,057.4 | 3.55 | 6.46 | 9.37 | 15.10 | 0.532 | 0.857 |
-| Final | B, first | 1,055.9 | 3.01 | 4.74 | 8.69 | 14.31 | 0.494 | 0.813 |
+| Superseded `favorite2` | A, second | 1,057.4 | 3.55 | 6.46 | 9.37 | 15.10 | 0.532 | 0.857 |
+| Superseded `favorite2` | B, first | 1,055.9 | 3.01 | 4.74 | 8.69 | 14.31 | 0.494 | 0.813 |
 | Original | B, second | 1,054.8 | 18.05 | 41.57 | 38.17 | 18.02 | 2.171 | 1.025 |
 
 Averaging these equal-load trials, PostgreSQL CPU/request falls from 2.196 to 0.513 ms, application CPU/request from 1.036 to 0.835 ms, and their sum from 3.232 to 1.348 ms: approximately 77%, 19%, and 58% reductions respectively. Mean feed latency falls from 20.2-21.2 ms to 1.7-2.0 ms.
 
 Requests/s stays almost constant because this is the same think-time-driven offered load. The result demonstrates better efficiency and latency, not a measured 2.4-times capacity increase. The longer warm-up also explains why these baseline tails are much lower than the initial short screening trial; cross-phase tail differences must not be assigned to an optimization.
+
+## Corrected candidate: fresh measurements and recovery
+
+The immutable `correctness-id32` candidate uses assembly SHA-256 `EC93DD980E36320DB9A72503382947E50B38133124ED1E539BB65EAB804E1ACE`. Its snapshot matches the current application source and project/SDK files. The same pinned runtime, ordinary `conduit` role, seed cloning, CPU affinity, durability, 180-second warm-up, and 60-second ramp are retained. The corrected binary and preserved `favorite2` binary were not rebuilt between the failed and recovered holds.
+
+### Completed equal-load controls
+
+These are all three complete pairs that passed the SLA with zero errors and no generator flag. Pair A ran before the performance deterioration; the two recovery B pairs ran after the pause. The last pair reverses order. Timestamps are UTC run prefixes in `benchmarks/results`; retaining all of them makes the selection explicit rather than choosing a single best baseline or candidate tail.
+
+| Pair/order | Run prefix | Candidate | Requests/s | p95 ms | p99 ms | PG CPU % | App CPU % | PG CPU-ms/request | App CPU-ms/request |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| A, first | `20261031T055505` | Original | 1,055.6 | 32.58 | 89.28 | 43.09 | 19.82 | 2.449 | 1.126 |
+| A, second | `20261031T060143` | Corrected | 1,057.4 | 4.50 | 11.05 | 10.51 | 16.34 | 0.597 | 0.927 |
+| Recovery B, first | `20261102T050422` | Original | 1,054.5 | 17.34 | 39.71 | 37.53 | 17.77 | 2.136 | 1.011 |
+| Recovery B, second | `20261102T051056` | Corrected | 1,055.7 | 3.95 | 8.70 | 10.11 | 15.09 | 0.574 | 0.857 |
+| Reversed B, first | `20261102T054635` | Corrected | 1,055.8 | 3.61 | 6.91 | 9.53 | 14.57 | 0.541 | 0.828 |
+| Reversed B, second | `20261102T055307` | Original | 1,051.4 | 41.60 | 386.05 | 43.71 | 19.57 | 2.494 | 1.117 |
+
+Across these pairs, mean PostgreSQL CPU/request is 2.360 ms original versus 0.571 ms corrected; application CPU/request is 1.085 versus 0.871 ms; combined is 3.444 versus 1.441 ms. These are approximately 76%, 20%, and 58% reductions. They are descriptive averages of three pairs (seed A once, seed B twice), not independent confidence intervals. Feed means are 19.09-45.53 ms original versus 1.97-2.31 ms corrected. Offered throughput remains essentially equal, so this is not a measured capacity multiplier.
+
+The initial B attempt's corrected run (`20261031T060818`) also passed at 1,055.7 requests/s, p95 5.95 ms, p99 15.30 ms, PG CPU/request 0.672 ms, and app CPU/request 0.979 ms. Its subsequent baseline did not sustain the same offered rate and failed the SLA; therefore that attempt is not included in the equal-load paired average. Both raw results remain in the evidence.
+
+### Sustained recovery comparison
+
+These five-minute measurements use the original hold workload IDs. All three pass the SLA with zero errors and no generator limitation. The old binary runs only as a diagnostic control, not as a valid submission candidate.
+
+| Candidate | Seed/order | Run prefix | Requests/s | p95 ms | p99 ms | PG CPU % | App CPU % |
+|---|---|---|---:|---:|---:|---:|---:|---:|
+| Superseded `favorite2` | A, first | `20261102T051727` | 5,296.9 | 21.87 | 79.74 | 44.40 | 35.65 |
+| Corrected `correctness-id32` | A, second | `20261102T052700` | 5,288.0 | 48.32 | 230.40 | 45.72 | 36.16 |
+| Corrected `correctness-id32` | B | `20261102T053635` | 5,277.3 | 65.06 | 400.13 | 45.67 | 36.39 |
+
+Correctness has a potential cost, not a free performance claim: in the single same-seed old/new recovery comparison, PG CPU/request is 0.503 versus 0.519 ms, app CPU/request 0.404 versus 0.410 ms, and the corrected tail is higher. Neither the order nor the number of repetitions isolates the extra command's causal cost. The old candidate's original p99 range was 146-274 ms, while its recovery control reached 80 ms, demonstrating substantial host/run variability even without a source change. The corrected implementation nevertheless passes both recovery holds without abandoning standard framework features or durability.
+
+### Failed attempts are not discarded
+
+| Candidate/load | Run prefix | Requests/s | p95 ms | p99 ms | Errors % | Generator flag |
+|---|---|---:|---:|---:|---:|---|
+| Original, 4,000 users | `20261031T061450` | 858.2 | 4,175.87 | 6,397.95 | 0.067 | No |
+| Corrected, 20,000 users, A | `20261031T062124` | 2,945.4 | 8,577.02 | 10,051.58 | 2.701 | Yes: sampler tick 2,791 ms late |
+| Corrected, 20,000 users, B | `20261031T063104` | 3,040.6 | 8,183.81 | 10,002.43 | 1.618 | No |
+
+The unmodified baseline deteriorated before the corrected high-load failures. A concurrent video call was reported while the local investigation was running, and testing was paused. A recovery attempt was interrupted before any timed result completed; its helper and PostgreSQL were stopped. Later runs resumed with the same binaries and fixture. This chronology makes host interference plausible, but no synchronized host trace establishes that the call caused the failures. The failed snapshots reported no PostgreSQL deadlocks or container memory-limit/OOM events; that does not rule out CPU scheduling, I/O, host activity, or other application/database effects. One failed hold had a generator flag and the other did not, so the generator flag alone does not explain the deterioration.
+
+The recovery results demonstrate successful later runs, not proof that the failure mechanism is solved. Absolute p99 remains noisy, including the passing reversed baseline's 386-ms p99. All 13 new completed trials, including these failures and the extra successful B control, are retained. A dedicated Linux target and separate generator are still required before an official capacity claim.
 
 ## Remaining bottlenecks and plan evidence
 
@@ -147,13 +194,13 @@ The original-feed probe reconstructs the original LINQ, including the followee/u
 
 The first compiled-query profile at 12,000 users measured roughly 2.13 application cores, 128.5 MB/s allocated, about 3.9% of elapsed time in GC pauses, and a working set averaging 426 MB with a 527-MB maximum. EF reported about 4,204 queries/s and 149 saves/s; Npgsql reported about 99.8% prepared executions. Those values describe that instrumented run, not the final sustained-ranking runs.
 
-The final candidate's separate 35-second profile at 20,000 users, after a three-minute warm-up, measured approximately 2.49 application cores (2.01 user, 0.48 system), 194.5 MB/s allocated, 3.2% elapsed GC pause time, and an 840-MB mean working set with a 1.00-GB maximum. The highest one-second GC-pause sample was 127 ms; that is an interval total, not necessarily one pause. EF reported approximately 6,176 queries/s and 95 saves/s, with about 99.97% prepared executions. The collectors themselves perturb execution, so these numbers must not replace the unprofiled hold's CPU measurements.
+The superseded `favorite2` candidate's separate 35-second profile at 20,000 users, after a three-minute warm-up, measured approximately 2.49 application cores (2.01 user, 0.48 system), 194.5 MB/s allocated, 3.2% elapsed GC pause time, and an 840-MB mean working set with a 1.00-GB maximum. The highest one-second GC-pause sample was 127 ms; that is an interval total, not necessarily one pause. EF reported approximately 6,176 queries/s and 95 saves/s, with about 99.97% prepared executions. This profile was not repeated for `correctness-id32`; its allocation and query rates are historical diagnostic evidence, not measurements of the corrected binary. The collectors themselves perturb execution, so these numbers must not replace an unprofiled hold's CPU measurements.
 
 The application still performs EF query execution/materialization, standard JWT signature and expiry validation, JSON serialization, and bcrypt. Login and registration must retain bcrypt cost 10; neither password-result caching nor offloading it to a custom crypto implementation is an acceptable optimization here. GC is measurable, but the workstation-GC experiment shows that changing collectors is not a free throughput gain.
 
 Connection/reset traffic and PostgreSQL WAL synchronization are additional costs. Sampled database sessions included active reads, connection reset commands, and some `WalSync`/`WALWrite` waits; many samples were idle client reads. That establishes the presence of those mechanisms, not their aggregate CPU or latency contribution.
 
-In the final profile's 27 database snapshots, there were 864 session observations: 739 were idle client reads; 13 active observations were `WalSync` and 12 were `WALWrite`. Eight active query observations showed connection-reset SQL. Active read observations included page projections and the capped feed count. These are sampled session observations, not counts of requests or percentages of CPU time. They support retaining connection reuse and treating durable-write stalls as a remaining tail-latency concern, not disabling resets or durability.
+In that historical profile's 27 database snapshots, there were 864 session observations: 739 were idle client reads; 13 active observations were `WalSync` and 12 were `WALWrite`. Eight active query observations showed connection-reset SQL. Active read observations included page projections and the capped feed count. These are sampled session observations, not counts of requests or percentages of CPU time. They support retaining connection reuse and treating durable-write stalls as a remaining tail-latency concern, not disabling resets or durability.
 
 **Profiling limitation:** the collected managed traces are sampled thread-time/wall-clock stacks, heavily influenced by blocked waits. They must not be read as on-CPU percentages. The runtime advertised Linux on-CPU collection, but the actual collection failed with `Operation not permitted (os error 1)` in this Docker environment. No privileged workaround or host reconfiguration was attempted. Some runtime/Npgsql up-down instruments are exported as rates or deltas; negative deltas are not negative numbers of threads, queued requests, or executing commands.
 
@@ -171,4 +218,12 @@ Source, reproducibility instructions, compact raw measurements, variant patches,
 
 ## Correctness
 
-The exact final published candidate passes all 197 official conformance steps and 40 focused API assertions. Focused cases cover sorted/empty tags, UTC timestamp precision, comments 404 versus empty results, bounded feed pagination and integer-overflow safety, filter precedence, anonymous/viewer isolation, concurrent duplicate favorites, missing-article favorite/unfavorite responses, repeated unfavorite operations, and concurrent creation of shared tags in opposite input order. The untouched baseline also passes all 197 steps in the final harness.
+The corrected candidate passes all 197 official conformance steps and the existing 40 focused API assertions. Focused cases cover sorted/empty tags, UTC timestamp precision, comments 404 versus empty results, bounded feed pagination and integer-overflow safety, filter precedence, anonymous/viewer isolation, concurrent duplicate favorites, missing-article favorite/unfavorite responses, repeated unfavorite operations, and concurrent creation of shared tags in opposite input order. The untouched baseline also passed all 197 steps in the original final harness.
+
+Three new deterministic regressions force concurrent article renames with ordinary PostgreSQL transactions and locks, outside the timed workload. Favorite and unfavorite are blocked on an uncommitted favorite-row update while the author renames the article through the API. Delete resolves the old committed slug while an uncommitted article rename blocks its mutation; committing the rename then releases the delete. The checks verify the returned article/state or actual disappearance by stable ID. Each case failed against the preserved `favorite2` binary for the reviewed reason and passed against `correctness-id32`. No production test hooks, command interceptors, schema changes, or probabilistic race loops were added.
+
+The database URI adapter also no longer silently discards query parameters such as `sslmode=verify-full` or certificate settings. It rejects query parameters, fragments, and non-PostgreSQL schemes when services are registered. Four focused checks verify this failure behavior. This is fail-fast rejection, not implementation of URI TLS options or proof of secure remote deployment; the local fixture continues using isolated loopback connections.
+
+**Identifier limits remain a documented benchmark/production boundary.** At the review owner's request, non-empty username/title validation and the exact mandated slug formula are preserved rather than adding a non-contract length cap. Very long route-backed identifiers can still exceed Kestrel's default 8,192-byte HTTP/1.1 request-line limit; sufficiently large index keys can also hit PostgreSQL limits. Passing ordinary benchmark inputs is not proof that these fields are suitable for unrestricted production input. Production adoption needs an explicit, consistently enforced identifier-length policy and supported database TLS configuration.
+
+The revision does not claim a general production hardening audit. Other reviewed policies remain unchanged: the benchmark's JWT issuer/audience and 30-day token requirements, post-commit response reads that can fail after a successful write, nontransactional page/count reads, synchronous bcrypt admission under hostile load, and feed cost for unusually large following lists or deep offsets. Those need application-specific requirements, not benchmark-specific shortcuts.

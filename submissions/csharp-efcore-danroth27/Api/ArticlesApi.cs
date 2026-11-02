@@ -110,11 +110,12 @@ public static class ArticlesApi
 
     static async Task<Results<NoContent, ProblemHttpResult>> Delete(string slug, Viewer viewer, ConduitDb db, CancellationToken ct)
     {
-        var authorId = await db.Articles.Where(a => a.Slug == slug).Select(a => (long?)a.AuthorId).SingleOrDefaultAsync(ct);
-        if (authorId is null) return Errors.NotFound;
-        if (authorId != viewer.Id) return Errors.Forbidden;
+        var article = await db.Articles.Where(a => a.Slug == slug)
+            .Select(a => new { a.Id, a.AuthorId }).SingleOrDefaultAsync(ct);
+        if (article is null) return Errors.NotFound;
+        if (article.AuthorId != viewer.Id) return Errors.Forbidden;
 
-        await db.Articles.Where(a => a.Slug == slug).ExecuteDeleteAsync(ct);
+        await db.Articles.Where(a => a.Id == article.Id && a.AuthorId == viewer.Id).ExecuteDeleteAsync(ct);
         return TypedResults.NoContent();
     }
 
@@ -129,11 +130,13 @@ public static class ArticlesApi
     static async Task<Results<Ok<ArticleResponse>, ProblemHttpResult>> ChangeFavorite(
         string slug, bool favorite, Viewer viewer, ConduitDb db, CancellationToken ct)
     {
-        if (favorite) await db.FavoriteAsync(viewer.Id, slug, ct);
-        else await db.UnfavoriteAsync(viewer.Id, slug, ct);
+        var articleId = await db.ArticleIdAsync(slug, ct);
+        if (articleId is null) return Errors.NotFound;
 
-        var article = await ReadQueries.ArticleBySlug(db, slug, viewer.Id, ct);
-        return article is null ? Errors.NotFound : TypedResults.Ok(new ArticleResponse(article));
+        if (favorite) await db.FavoriteAsync(viewer.Id, articleId.Value, ct);
+        else await db.UnfavoriteAsync(viewer.Id, articleId.Value, ct);
+
+        return TypedResults.Ok(new ArticleResponse(await Find(db, articleId.Value, viewer, ct)));
     }
 
     static Task<ArticleView> Find(ConduitDb db, long id, Viewer viewer, CancellationToken ct) =>

@@ -1,0 +1,36 @@
+{
+  "variant": "baseline-final",
+  "users": 4000,
+  "workload": "optimization-control-final-b",
+  "candidate": {
+    "name": "baseline-final",
+    "sdk": "10.0.403",
+    "sha256": "4CE81E1763552313626294C447401F695FF1053D48BC77E5EDE3DA127C26A68E",
+    "environment": {},
+    "properties": {},
+    "description": "Original code with ordinary conduit role for final matched comparisons",
+    "created_utc": "2026-10-30T22:54:21.8856940+00:00",
+    "source_patch": null,
+    "database_role": "conduit"
+  },
+  "cpu": {
+    "postgres": {
+      "elapsed_ms": 114710,
+      "core_seconds": 488.145545,
+      "cpu_percent": 70.9245844593613
+    },
+    "app": {
+      "elapsed_ms": 112579,
+      "core_seconds": 178.312092,
+      "cpu_percent": 26.39806891160874
+    },
+    "loadgen": {
+      "elapsed_ms": 111364,
+      "core_seconds": 42.645691,
+      "cpu_percent": 19.14698241801659
+    }
+  },
+  "warmup_seconds": 180,
+  "ramp_seconds": 60,
+  "measure_seconds": 120
+}
